@@ -18,7 +18,14 @@
     },
     "autoload": {
        "psr-4": {
-         "Dlnsk\\HierarchicalRBAC\\": "src/HierarchicalRBAC/"
+         "Dlnsk\\HierarchicalRBAC\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Dlnsk\\HierarchicalRBAC\\HRBACServiceProvider"
+            ]
         }
     }
 }
