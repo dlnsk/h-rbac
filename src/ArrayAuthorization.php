@@ -2,6 +2,8 @@
 
 namespace Dlnsk\HierarchicalRBAC;
 
+use Illuminate\Support\Str;
+
 
 class ArrayAuthorization
 {
@@ -15,7 +17,7 @@ class ArrayAuthorization
 
 	private function testUsingUserMethod($user, $initial_ability, $current_ability, $arguments) {
 		$methods = get_class_methods($this);
-		$method = camel_case($current_ability);
+		$method = Str::camel($current_ability);
 		if (in_array($method, $methods)) {
 			// Преобразуем массив в единичный элемент если он содержит один элемент
 			// или это ассоциативный массив с любым кол-вом элементов
