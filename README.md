@@ -1,6 +1,6 @@
 # h-rbac
 
-Based on native Laravel's 5 abilities. Hierarchical RBAC with callbacks.
+Based on native Laravel's 5.\*/6.\* abilities. Hierarchical RBAC with callbacks.
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
@@ -18,7 +18,7 @@ In the process of creating my own projects I have formed an opinion about the mi
 
 ## Install
 
-> Keep in mind it's only for Laravel 5.1 and later.
+> Keep in mind it's only for Laravel 5.1 and later (6.\* also supported).
 
 Via Composer
 
@@ -26,9 +26,9 @@ Via Composer
 $ composer require dlnsk/h-rbac
 ```
 
-Add the service provider to `config/app.php`
+Add the service provider to `config/app.php`. We use auto-discovering feature since Laravel 5.5, so you may don't touch `app.php`.
 
-	Dlnsk\HierarchicalRBAC\HRBACServiceProvider::class,
+    Dlnsk\HierarchicalRBAC\HRBACServiceProvider::class,
 
 Publish some cool stuff:
 
@@ -38,7 +38,7 @@ Publish some cool stuff:
 
 with
 
-	php artisan vendor:publish --provider="Dlnsk\HierarchicalRBAC\HRBACServiceProvider"
+    php artisan vendor:publish --provider="Dlnsk\HierarchicalRBAC\HRBACServiceProvider"
 
 Add roles, permissions which you need and callbacks where it needs and have fun!
 
@@ -58,7 +58,7 @@ Very common situation is to allow user to change only his own posts. With this p
 
 ``` php
 public function editOwnPost($user, $post) {
-	return $user->id === $post->user_id;
+    return $user->id === $post->user_id;
 }
 ```
 
@@ -98,17 +98,17 @@ Storage of roles and permissions is on another level of logic, so DB support may
 As I said `h-rbac` is wrapper for [authorization logic](https://laravel.com/docs/5.2/authorization#checking-abilities) of Laravel 5.1 and later. So, you can use any features of it.
 
 ```php
-if (\Gate::allows('editPost', $post)) { // do something }
+if (\Gate::allows('editPost', $post)) { /* do something */ }
 ...
 if (\Gate::denies('editPost', $post)) { abort(403); }
 ...
-if (\Gate::forUser($user)->allows('editPost', $post)) { // do something }
+if (\Gate::forUser($user)->allows('editPost', $post)) { /* do something */ }
 ```
 
 From User model:
 
 ```php
-if ($request->user()->can('editPost', $post)) { // do something }
+if ($request->user()->can('editPost', $post)) { /* do something */ }
 ...
 if ($request->user()->cannot('editPost', $post)) { abort(403); }
 ```
@@ -121,18 +121,18 @@ $this->authorize('editPost', $post);
 
 Within Blade
 
-	@can('editPost', $post)
-	    <!-- The Current User Can Update The Post -->
-	@else
-	    <!-- The Current User Can't Update The Post -->
-	@endcan
+    @can('editPost', $post)
+        <!-- The Current User Can Update The Post -->
+    @else
+        <!-- The Current User Can't Update The Post -->
+    @endcan
 
 Also in `h-rbac` we add directive `@role` which you can combine with `@else`
 
 
-	@role('user|manager')
-		<!-- The current user has any role -->
-	@endrole
+    @role('user|manager')
+        <!-- The current user has any role -->
+    @endrole
 
 ## Configuration
 
@@ -147,40 +147,40 @@ use Dlnsk\HierarchicalRBAC\Authorization;
 
 class AuthorizationClass extends Authorization
 {
-	public function getPermissions() {
-		return [
-			'editPost' => [
-					'description' => 'Edit any posts',  // optional property
-					'next' => 'editOwnPost',            // used for making chain (hierarchy) of permissions
-				],
-			'editOwnPost' => [
-					'description' => 'Edit own post',
-				],
-			'deletePost' => [
-					'description' => 'Delete any posts',
-				],
-		];
-	}
+    public function getPermissions() {
+        return [
+            'editPost' => [
+                    'description' => 'Edit any posts',  // optional property
+                    'next' => 'editOwnPost',            // used for making chain (hierarchy) of permissions
+                ],
+            'editOwnPost' => [
+                    'description' => 'Edit own post',
+                ],
+            'deletePost' => [
+                    'description' => 'Delete any posts',
+                ],
+        ];
+    }
 
-	public function getRoles() {
-		return [
-			'manager' => [
-					'editPost',
-					'deletePost',
-				],
-			'user' => [
-					'editOwnPost',
-				],
-		];
-	}
+    public function getRoles() {
+        return [
+            'manager' => [
+                    'editPost',
+                    'deletePost',
+                ],
+            'user' => [
+                    'editOwnPost',
+                ],
+        ];
+    }
 
-	////////////// Callbacks ///////////////
-	
-	public function editOwnPost($user, $post) {
-		$post = $this->getModel(\App\Post::class, $post);  // helper method for geting model
+    ////////////// Callbacks ///////////////
 
-		return $user->id === $post->user_id;
-	}
+    public function editOwnPost($user, $post) {
+        $post = $this->getModel(\App\Post::class, $post);  // helper method for geting model
+
+        return $user->id === $post->user_id;
+    }
 
 }
 ```
