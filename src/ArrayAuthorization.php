@@ -3,6 +3,7 @@
 namespace Dlnsk\HierarchicalRBAC;
 
 use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 
 
 class ArrayAuthorization
@@ -36,26 +37,15 @@ class ArrayAuthorization
 	 *
 	 * @return boolean
 	 */
-	public function checkPermission($user, $ability, $arguments)
+	public function checkAbility($user, $user_abilities, $ability, $arguments)
 	{
-		if ($user->role === 'admin') {
-			return true;
-		}
-
-		// У пользователя роль, которой нет в списке
-		$roles = $this->getRoles();
-		if (!isset($roles[$user->role])) {
-			return null;
-		}
-
 		// Ищем разрешение для данной роли среди наследников текущего разрешения
-		$role = $roles[$user->role];
 		$permissions = $this->getPermissions();
 		$current = $ability;
 		// Если для разрешения указана замена - элемент 'equal', то проверяется замена
 		// (только при наличии оригинального разрешения в роли).
 		// Callback оригинального не вызывается.
-		if (in_array($current, $role) and isset($permissions[$current]['equal'])) {
+		if (in_array($current, $user_abilities) and isset($permissions[$current]['equal'])) {
 			$current = $permissions[$current]['equal'];
 		}
 
@@ -66,7 +56,7 @@ class ArrayAuthorization
 				throw new \Exception("Seems like permission '{$ability}' is in infinite loop");
 			}
 
-			if (in_array($current, $role)) {
+			if (in_array($current, $user_abilities)) {
 				$suitable = $suitable || $this->testUsingUserMethod($user, $ability, $current, $arguments);
 			}
 			if (isset($permissions[$current]['next']) and !$suitable) {
@@ -77,6 +67,34 @@ class ArrayAuthorization
 		}
 		return null;
 	}
+
+
+	public function checkPermission($user, $ability, $arguments)
+	{
+		$attribute = config('h-rbac.userRolesAttribute');
+		$user_roles = Arr::wrap($user->role ?? null) ?: Arr::wrap($user->$attribute ?? null);
+
+		if (in_array('admin', $user_roles)) {
+			return true;
+		}
+
+		// У пользователя роли, которых нет в списке ролей приложения
+		$application_roles = array_keys($this->getRoles());
+		$both_roles = array_intersect($application_roles, $user_roles);
+		if (!count($both_roles)) {
+			return null;
+		}
+
+		$abilities = $this->getRoles();
+		$user_abilities = [];
+		foreach ($both_roles as $role_name) {
+			$user_abilities = array_merge($user_abilities, $abilities[$role_name]);
+		}
+		$result = $this->checkAbility($user, $user_abilities, $ability, $arguments);
+
+		return is_bool($result) ? $result : null;
+	}
+
 
 
 	/**
