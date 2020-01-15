@@ -47,7 +47,8 @@ class AuthorizationClass extends Authorization
 	 */
 
 	public function editOwnPost($user, $post) {
-		$post = $this->getModel(\App\Post::class, $post);  // helper method for geting model
+		// This is a helper method for getting the model if $post is id
+		// $post = $this->getModel(\App\Post::class, $post);
 
 		return $user->id === $post->user_id;
 	}
