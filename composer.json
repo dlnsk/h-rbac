@@ -19,8 +19,7 @@
     },
     "autoload": {
        "psr-4": {
-         "Dlnsk\\HierarchicalRBAC\\": "src",
-         "App\\Classes\\Authorization\\": "classes"
+         "Dlnsk\\HierarchicalRBAC\\": "src"
         }
     },
     "autoload-dev": {
