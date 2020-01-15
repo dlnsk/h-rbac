@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace Dlnsk\HierarchicalRBAC;
 
 use Illuminate\Support\ServiceProvider;
@@ -12,7 +12,7 @@ use Illuminate\View\Compilers\BladeCompiler;
 class HRBACServiceProvider extends ServiceProvider {
 
     /**
-     * This will be used to register config & view in 
+     * This will be used to register config & view in
      * package namespace.
      */
     protected $packageName = 'h-rbac';
@@ -24,18 +24,21 @@ class HRBACServiceProvider extends ServiceProvider {
      */
     public function boot()
     {
-        // Register your migration's publisher
-        $this->publishes([
-            __DIR__.'/../database/migrations/' => base_path('database/migrations')
-        ], 'migrations');
-        
-        // Publish your config
-        $this->publishes([
-            __DIR__.'/../config/config.php' => config_path($this->packageName.'.php'),
-            __DIR__.'/../config/exampleClass.php' => app_path('Classes/Authorization/AuthorizationClass.php'),
-        ], 'config');
+        if ($this->app->runningInConsole()) {
 
-        //
+            // Register your migration's publisher
+            $this->publishes([
+                __DIR__ . '/../database/migrations/add_role_field_to_users.stub'
+                                => database_path('migrations/' . date('Y_m_d_His', time()) . '_add_role_field_to_users.php'),
+            ], 'migrations');
+
+            // Publish your config
+            $this->publishes([
+                __DIR__.'/../config/config.php' => config_path($this->packageName.'.php'),
+                __DIR__.'/../classes/AuthorizationClass.php' => app_path('Classes/Authorization/AuthorizationClass.php'),
+            ], 'config');
+
+        }
     }
 
     /**
@@ -55,7 +58,10 @@ class HRBACServiceProvider extends ServiceProvider {
 
         $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
             $bladeCompiler->directive('role', function ($roles) {
-                return "<?php if(auth()->check() && in_array(auth()->user()->role, explode('|', $roles))): ?>";
+                return '<?php
+                    $__attribute = config("h-rbac.userRolesAttribute");
+                    $__user_roles = Arr::wrap(auth()->user()->role ?? null) ?: Arr::wrap(auth()->user()->$__attribute ?? null);
+                    if(auth()->check() && array_intersect($__user_roles, explode("|", '.$roles.'))): ?>';
             });
             $bladeCompiler->directive('endrole', function () {
                 return '<?php endif; ?>';

@@ -11,14 +11,21 @@
         }
     ],
     "require": {
-        "illuminate/support": "~5.7|>=6.0"
+        "laravel/framework": "~5.7|>=6.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.5"
+        "phpunit/phpunit": "^8.0",
+        "orchestra/testbench": "^4.5"
     },
     "autoload": {
        "psr-4": {
-         "Dlnsk\\HierarchicalRBAC\\": "src"
+         "Dlnsk\\HierarchicalRBAC\\": "src",
+         "App\\Classes\\Authorization\\": "classes"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Dlnsk\\HierarchicalRBAC\\Tests\\": "tests"
         }
     },
     "extra": {
