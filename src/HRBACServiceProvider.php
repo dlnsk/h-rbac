@@ -59,8 +59,9 @@ class HRBACServiceProvider extends ServiceProvider {
         $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
             $bladeCompiler->directive('role', function ($roles) {
                 return '<?php
-                    $__attribute = config("h-rbac.userRolesAttribute");
-                    $__user_roles = Arr::wrap(auth()->user()->role ?? null) ?: Arr::wrap(auth()->user()->$__attribute ?? null);
+                    $__many_roles  = config("h-rbac.userRolesAttribute");
+                    $__single_role = config("h-rbac.singleRoleAttribute", "role");
+                    $__user_roles = Arr::wrap(auth()->user()->$__single_role ?? null) ?: Arr::wrap(auth()->user()->$__many_roles ?? null);
                     if(auth()->check() && array_intersect($__user_roles, explode("|", '.$roles.'))): ?>';
             });
             $bladeCompiler->directive('endrole', function () {

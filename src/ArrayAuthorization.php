@@ -71,8 +71,9 @@ class ArrayAuthorization
 
 	public function checkPermission($user, $ability, $arguments)
 	{
-		$attribute = config('h-rbac.userRolesAttribute');
-		$user_roles = Arr::wrap($user->role ?? null) ?: Arr::wrap($user->$attribute ?? null);
+		$many_roles  = config('h-rbac.userRolesAttribute');
+		$single_role = config('h-rbac.singleRoleAttribute', 'role');
+		$user_roles = Arr::wrap($user->$single_role ?? null) ?: Arr::wrap($user->$many_roles ?? null);
 
 		if (in_array('admin', $user_roles)) {
 			return true;
