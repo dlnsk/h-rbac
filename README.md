@@ -33,7 +33,7 @@ Add the service provider to `config/app.php`. We use auto-discovering feature si
 Publish some cool stuff:
 
  - config file (config/h-rbac.php)
- - migration (add field `role` to `users` table)
+ - migration (adding field `role` to `users` table), only if you suppose to use one role per user
  - role/permission/callbacks configuration class (app/Classes/Authorization/AuthorizationClass.php)
 
 with
@@ -41,6 +41,16 @@ with
     php artisan vendor:publish --provider="Dlnsk\HierarchicalRBAC\HRBACServiceProvider"
 
 Add roles, permissions which you need and callbacks where it needs and have fun!
+
+### Many To Many with roles
+
+If you want to use "Many To Many" relationship between users and roles add an accessor to `User` model. Name of attribute you can change in `config/h-rbac.php` if you need:
+
+``` php
+public function getOwnRolesAttribute() {
+    return $this->roles()->pluck('name')->toArray();
+}
+```
 
 ## Overview
 
