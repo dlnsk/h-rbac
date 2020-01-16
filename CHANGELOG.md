@@ -4,6 +4,17 @@ All Notable changes to `h-rbac` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## [0.4.2] - 2020-01-15
+### Added
+- Allow to configure single-role attribute of model
+
+### Fixed
+- Use own autorization class for tests
+
+## [0.4.1] - 2020-01-15
+### Fixed
+- Fix getting wrong roles from example file
+
 ## [0.4.0] - 2020-01-15
 ### Added
 - Support for multiply roles (many-to-many relationship). Backward compatible.
