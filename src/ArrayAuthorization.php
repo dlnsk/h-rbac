@@ -101,7 +101,7 @@ class ArrayAuthorization
 	/**
 	 * Return model of given class or exception if can't
 	 *
-	 * @param  class 			$class 		This is a class which instance we need.
+	 * @param  string 		$class 		This is a class which instance we need.
 	 * @param  Model|integer 	$id 		Instance or its ID
 	 *
 	 * @return Model|exception
