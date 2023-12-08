@@ -4,6 +4,10 @@ All Notable changes to `h-rbac` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## [0.4.3] - 2023-12-08
+### Fixed
+- Small type fix
+
 ## [0.4.2] - 2020-01-15
 ### Added
 - Allow to configure single-role attribute of model

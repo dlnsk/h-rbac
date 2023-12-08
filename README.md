@@ -1,6 +1,6 @@
 # h-rbac
 
-Based on native Laravel's 5.\*/6.\* abilities. Hierarchical RBAC with callbacks.
+Based on native Laravel's abilities. Hierarchical RBAC with callbacks.
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
@@ -18,7 +18,7 @@ In the process of creating my own projects I have formed an opinion about the mi
 
 ## Install
 
-> Keep in mind it's only for Laravel 5.1 and later (6.\* also supported).
+> Keep in mind it's only for Laravel 5.1 and later (6.\*-10.\* and above also supported).
 
 Via Composer
 
