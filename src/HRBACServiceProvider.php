@@ -1,6 +1,12 @@
 <?php
 namespace Dlnsk\HierarchicalRBAC;
 
+use Dlnsk\HierarchicalRBAC\Contracts\PermissionChecker;
+use Dlnsk\HierarchicalRBAC\Contracts\PermissionsProvider;
+use Dlnsk\HierarchicalRBAC\Contracts\RolesProvider;
+use Dlnsk\HierarchicalRBAC\Providers\ArrayPermissionProvider;
+use Dlnsk\HierarchicalRBAC\Providers\EloquentRolesProvider;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 
@@ -16,6 +22,12 @@ class HRBACServiceProvider extends ServiceProvider {
      * package namespace.
      */
     protected $packageName = 'h-rbac';
+
+    public $bindings = [
+        PermissionChecker::class => CommonPermissionChecker::class,
+        RolesProvider::class => EloquentRolesProvider::class,
+        PermissionsProvider::class => ArrayPermissionProvider::class,
+    ];
 
     /**
      * Bootstrap the application services.
@@ -35,7 +47,6 @@ class HRBACServiceProvider extends ServiceProvider {
             // Publish your config
             $this->publishes([
                 __DIR__.'/../config/config.php' => config_path($this->packageName.'.php'),
-                __DIR__.'/../classes/AuthorizationClass.php' => app_path('Classes/Authorization/AuthorizationClass.php'),
             ], 'config');
 
         }
@@ -50,10 +61,9 @@ class HRBACServiceProvider extends ServiceProvider {
     {
         $this->mergeConfigFrom( __DIR__.'/../config/config.php', $this->packageName);
 
-        \Gate::before(function ($user, $ability, $arguments) {
-            $class = config($this->packageName.'.rbacClass');
-            $rbac = new $class();
-            return $rbac->checkPermission($user, $ability, $arguments);
+        Gate::before(function ($user, $ability, $arguments) {
+            $permissionChecker = resolve(PermissionChecker::class, compact('user'));
+            return $permissionChecker->check($ability, $arguments);
         });
 
         $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {

@@ -1,9 +1,9 @@
-<?php
+<?php /** @noinspection NonAsciiCharacters */
 
 namespace Dlnsk\HierarchicalRBAC\Tests;
 
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Gate;
+
 
 class UnitTest extends TestCase
 {
