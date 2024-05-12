@@ -17,14 +17,10 @@ class EloquentRolesProvider implements Contracts\RolesProvider
 
     public function getUserRoles(): array
     {
-        $user_roles = [];
-        if(is_subclass_of($this->user, Model::class)) {
-            $many_roles  = config('h-rbac.userRolesAttribute');
-            $single_role = config('h-rbac.singleRoleAttribute', 'role');
-            $user_roles = Arr::wrap($this->user->$single_role ?? null) ?: Arr::wrap($this->user->$many_roles ?? null);
-        }
+        $many_roles  = config('h-rbac.userRolesAttribute');
+        $single_role = config('h-rbac.singleRoleAttribute', 'role');
 
-        return $user_roles;
+        return Arr::wrap($this->user->$single_role ?? null) ?: Arr::wrap($this->user->$many_roles ?? null);
     }
 
     public function getApplicationRoles(): array

@@ -26,8 +26,8 @@
      */
     'builtinRoles' => [
         'manager' => [
-            'editPost',
-            'deletePost',
+            'editAnyPost',
+            'deleteAnyPost',
         ],
         'user' => [
             'editOwnPost',
