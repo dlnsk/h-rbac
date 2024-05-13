@@ -28,9 +28,11 @@
         'manager' => [
             'editAnyPost',
             'deleteAnyPost',
+            'listAnyReports',
         ],
         'user' => [
             'editOwnPost',
+            'listEducationReports',
         ],
     ],
 
