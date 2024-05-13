@@ -1,8 +1,8 @@
 {
     "name": "dlnsk/h-rbac",
-    "description": "Based on native Laravel's abilities. Hierarchical RBAC with callbacks.",
+    "description": "Based on native Laravel's gates and policies. Hierarchical RBAC with callbacks.",
     "license": "MIT",
-    "keywords": ["laravel", "rbac", "hierarchical", "ability", "role", "permission"],
+    "keywords": ["laravel", "rbac", "hierarchical", "ability", "role", "permission", "gate", "policy"],
     "homepage": "https://github.com/dlnsk/h-rbac",
     "authors": [
         {
