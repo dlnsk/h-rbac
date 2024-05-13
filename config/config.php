@@ -16,10 +16,10 @@
 
     /**
      * Name of User model attribute that gives array of roles
-     * if you use many-to-many relationship
+     * if you use one-to-many or many-to-many relationships
      */
 
-    'userRolesAttribute' => 'own_roles',
+    'manyRolesAttribute' => 'own_roles',
 
     /**
      * Built-in application roles and its permissions
