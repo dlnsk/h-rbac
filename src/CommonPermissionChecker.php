@@ -65,8 +65,8 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
         }
 
         $chain = $policyWrp->getChainFor($ability);
-        $permission_intersection = array_intersect($chain, $user_permissions);
-        foreach ($permission_intersection as $permission) {
+        $permission_intersection = array_intersect_key($user_permissions, array_fill_keys($chain, null));
+        foreach ($permission_intersection as $permission => $value) {
             $callback_name = $policyWrp->getCallbackName($permission);
             if ($callback_name) {
                 if (!empty($arguments)) {
@@ -75,7 +75,7 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
                 } else {
                     $arg = null;
                 }
-                if ($policyWrp->call($callback_name, $this->user, $arg, $ability)) {
+                if ($policyWrp->call($callback_name, $this->user, $arg, $value, $ability)) {
                     return true;
                 }
             } else {

@@ -25,9 +25,9 @@ class PolicyWrapper
         return in_array($callback_name, $methods) ? $callback_name : false;
     }
 
-    public function call($callback_name, $user, $arg, $ability): bool
+    public function call($callback_name, $user, $arg, $permission_value, $ability): bool
     {
-        return $this->policy->$callback_name($user, $arg, $ability);
+        return $this->policy->$callback_name($user, $arg, $permission_value, $ability);
     }
 
     public function isValid(): bool

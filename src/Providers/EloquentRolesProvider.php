@@ -3,7 +3,6 @@
 namespace Dlnsk\HierarchicalRBAC\Providers;
 
 use Dlnsk\HierarchicalRBAC\Contracts;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
 class EloquentRolesProvider implements Contracts\RolesProvider

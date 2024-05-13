@@ -10,7 +10,7 @@ class ArrayPermissionProvider implements Contracts\PermissionsProvider
     {
     }
 
-    public function getPermissions(array $roles)
+    public function getPermissions(array $roles): array
     {
         $app_roles = config('h-rbac.builtinRoles');
         $user_permissions = [];
@@ -18,6 +18,6 @@ class ArrayPermissionProvider implements Contracts\PermissionsProvider
             $user_permissions = array_merge($user_permissions, $app_roles[$role_name]);
         }
 
-        return $user_permissions;
+        return array_fill_keys($user_permissions, null);
     }
 }

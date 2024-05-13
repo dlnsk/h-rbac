@@ -11,6 +11,7 @@ class PostPolicy
         'edit' => [
             'editAnyPost',
             'editOwnPost',
+            'editFixedPost',
         ],
         'delete' => [
             'deleteAnyPost',
@@ -18,7 +19,17 @@ class PostPolicy
     ];
 
 
+    /**
+     * Check user can only edit self created posts.
+     */
     public function editOwnPost($user, $post): bool {
         return $user->id === $post->user_id;
+    }
+
+    /**
+     * Permission model contain post's id which allowed to edit to this user.
+     */
+    public function editFixedPost($user, $post, $permission): bool {
+        return $post->id === $permission->value;
     }
 }
