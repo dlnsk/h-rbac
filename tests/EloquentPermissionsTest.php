@@ -1,4 +1,4 @@
-<?php /** @noinspection NonAsciiCharacters */
+<?php
 
 namespace Dlnsk\HierarchicalRBAC\Tests;
 
