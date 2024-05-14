@@ -2,6 +2,7 @@
 
 namespace Dlnsk\HierarchicalRBAC\Tests;
 
+use Dlnsk\HierarchicalRBAC\Contracts\RolesProvider;
 use Illuminate\Support\Facades\Gate;
 
 
@@ -49,4 +50,21 @@ class RolesTest extends TestCase
         $this->assertTrue(Gate::forUser($this->user)->allows('edit', $this->post));
     }
 
+    public function test_roles_provider_gives_array_from_one_role()
+    {
+        $this->user->roles = 'manager';
+        $rolesProvider = resolve(RolesProvider::class, ['user' => $this->user]);
+
+        $this->assertIsArray($rolesProvider->getUserRoles());
+        $this->assertSame(['manager'], $rolesProvider->getUserRoles());
+    }
+
+    public function test_roles_provider_gives_array_from_many_role()
+    {
+        $this->user->roles = ['user', 'manager'];
+        $rolesProvider = resolve(RolesProvider::class, ['user' => $this->user]);
+
+        $this->assertIsArray($rolesProvider->getUserRoles());
+        $this->assertSame(['user', 'manager'], $rolesProvider->getUserRoles());
+    }
 }
