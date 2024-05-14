@@ -15,7 +15,10 @@ class PolicyWrapper
 
     public function hasAbility($ability): bool
     {
-        return in_array($ability, array_merge(array_values($this->policy->chains), array_keys($this->policy->chains)));
+        return collect($this->policy->chains)
+            ->flatten()
+            ->merge(array_keys($this->policy->chains))
+            ->contains($ability);
     }
 
     public function getCallbackName($permission)
@@ -41,6 +44,12 @@ class PolicyWrapper
             return [$ability];
         } elseif (isset($this->policy->chains[$ability])) {
             return array_unique(array_merge([$ability], $this->policy->chains[$ability]));
+        }
+        // Try to find the ability among the permissions. This is a rare case to check permission inside a chain.
+        foreach ($this->policy->chains as $chain) {
+            if (in_array($ability, $chain)) {
+                return [$ability];
+            }
         }
 
         return [];
