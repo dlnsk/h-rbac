@@ -24,28 +24,28 @@ class PostsTest extends TestCase
 
     public function test_user_has_dummy_role()
     {
-        $this->user->role = 'dummy';
+        $this->user->roles = 'dummy';
 
         $this->assertFalse(Gate::forUser($this->user)->allows('delete', $this->post));
     }
 
     public function test_user_has_right_role_an_permission()
     {
-        $this->user->role = 'manager';
+        $this->user->roles = 'manager';
 
         $this->assertTrue(Gate::forUser($this->user)->allows('delete', $this->post));
     }
 
     public function test_user_has_right_role_but_no_permission()
     {
-        $this->user->role = 'manager';
+        $this->user->roles = 'manager';
 
         $this->assertFalse(Gate::forUser($this->user)->allows('dummy_permission', $this->post));
     }
 
     public function test_manager_edit_own_post()
     {
-        $this->user->role = 'manager';
+        $this->user->roles = 'manager';
         $this->user->id = 1;
         $this->post->user_id = 1;
 
@@ -54,7 +54,7 @@ class PostsTest extends TestCase
 
     public function test_manager_edit_someone_else_post()
     {
-        $this->user->role = 'manager';
+        $this->user->roles = 'manager';
         $this->user->id = 1;
         $this->post->user_id = 2;
 
@@ -63,7 +63,7 @@ class PostsTest extends TestCase
 
     public function test_user_edit_own_post()
     {
-        $this->user->role = 'user';
+        $this->user->roles = 'user';
         $this->user->id = 1;
         $this->post->user_id = 1;
 
@@ -72,7 +72,7 @@ class PostsTest extends TestCase
 
     public function test_checking_concrete_allowed_permission()
     {
-        $this->user->role = 'manager';
+        $this->user->roles = 'manager';
         $this->user->id = 1;
         $this->post->user_id = 1;
 
@@ -82,7 +82,7 @@ class PostsTest extends TestCase
 
     public function test_checking_concrete_disallowed_permission()
     {
-        $this->user->role = 'manager';
+        $this->user->roles = 'manager';
         $this->user->id = 1;
         $this->post->user_id = 1;
 
@@ -92,7 +92,7 @@ class PostsTest extends TestCase
 
     public function test_checking_concrete_allowed_permission_with_callback()
     {
-        $this->user->role = 'user';
+        $this->user->roles = 'user';
         $this->user->id = 1;
         $this->post->user_id = 1;
 
@@ -102,7 +102,7 @@ class PostsTest extends TestCase
 
     public function test_checking_concrete_disallowed_permission_without_callback()
     {
-        $this->user->role = 'user';
+        $this->user->roles = 'user';
         $this->user->id = 1;
         $this->post->user_id = 1;
 
@@ -112,7 +112,7 @@ class PostsTest extends TestCase
 
     public function test_user_edit_someone_else_post()
     {
-        $this->user->role = 'user';
+        $this->user->roles = 'user';
         $this->user->id = 1;
         $this->post->user_id = 2;
 

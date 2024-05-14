@@ -21,7 +21,7 @@ class ConfigTest extends TestCase
 
     public function test_new_name_for_many_roles_attribute()
     {
-        app()['config']->set('h-rbac.manyRolesAttribute', 'changedName');
+        app()['config']->set('h-rbac.userRolesAttribute', 'changedName');
         $this->user->own_roles = ['manager'];
 
         $this->assertFalse(Gate::forUser($this->user)->allows('delete', $this->post));
@@ -36,7 +36,7 @@ class ConfigTest extends TestCase
         app()->bind(PermissionsProvider::class, EloquentPermissionProvider::class);
         app()['config']->set('h-rbac.permissionsAttribute', 'changedName');
         $this->user->id = 1;
-        $this->user->role = 'user';
+        $this->user->roles = 'user';
         $this->user->permissions = collect([
             (object)[
                 'user_id' => 1,

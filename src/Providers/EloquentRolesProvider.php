@@ -16,10 +16,9 @@ class EloquentRolesProvider implements Contracts\RolesProvider
 
     public function getUserRoles(): array
     {
-        $many_roles  = config('h-rbac.manyRolesAttribute');
-        $single_role = config('h-rbac.singleRoleAttribute', 'role');
+        $roles_attr = config('h-rbac.userRolesAttribute', 'role');
 
-        return Arr::wrap($this->user->$single_role ?? null) ?: Arr::wrap($this->user->$many_roles ?? null);
+        return Arr::wrap($this->user->$roles_attr ?? null);
     }
 
     public function getApplicationRoles(): array

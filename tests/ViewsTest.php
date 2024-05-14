@@ -65,7 +65,7 @@ class ViewsTest extends TestCase
     public function view_role()
     {
         $user = (object)[];
-        $user->role = 'manager';
+        $user->roles = 'manager';
         \Auth::shouldReceive('check')->andReturn(true);
         \Auth::shouldReceive('user')->andReturn($user);
 
@@ -82,7 +82,7 @@ class ViewsTest extends TestCase
     public function view_many_role()
     {
         $user = (object)[];
-        $user->own_roles = ['manager'];
+        $user->roles = ['manager'];
         \Auth::shouldReceive('check')->andReturn(true);
         \Auth::shouldReceive('user')->andReturn($user);
 

@@ -18,14 +18,14 @@ class ReportsTest extends TestCase
 
     public function test_user_has_permission_with_no_model()
     {
-        $this->user->role = 'manager';
+        $this->user->roles = 'manager';
 
         $this->assertTrue(Gate::forUser($this->user)->allows('list', ReportPolicy::class));
     }
 
     public function test_user_has_permission_with_no_model_and_callback()
     {
-        $this->user->role = 'user';
+        $this->user->roles = 'user';
 
         $this->assertTrue(Gate::forUser($this->user)->allows('list', [ReportPolicy::class, 'kind' => 'edu']));
     }

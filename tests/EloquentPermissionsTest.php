@@ -22,7 +22,7 @@ class EloquentPermissionsTest extends TestCase
 
     public function test_user_has_no_permission_attribute()
     {
-        $this->user->role = 'user';
+        $this->user->roles = 'user';
 
         $this->assertFalse(Gate::forUser($this->user)->allows('delete', $this->post));
     }
@@ -30,7 +30,7 @@ class EloquentPermissionsTest extends TestCase
     public function test_user_has_excluded_permission()
     {
         $this->user->id = 1;
-        $this->user->role = 'manager';
+        $this->user->roles = 'manager';
         $this->user->permissions = collect([
             (object)[
                 'user_id' => 1,
@@ -45,7 +45,7 @@ class EloquentPermissionsTest extends TestCase
     public function test_user_has_included_permission()
     {
         $this->user->id = 1;
-        $this->user->role = 'user';
+        $this->user->roles = 'user';
         $this->user->permissions = collect([
             (object)[
                 'user_id' => 1,
@@ -60,7 +60,7 @@ class EloquentPermissionsTest extends TestCase
     public function test_user_has_both_excluded_and_included_permission()
     {
         $this->user->id = 1;
-        $this->user->role = 'manager';
+        $this->user->roles = 'manager';
         $this->user->permissions = collect([
             (object)[
                 'user_id' => 1,
@@ -80,7 +80,7 @@ class EloquentPermissionsTest extends TestCase
     public function test_user_can_edit_concrete_post()
     {
         $this->user->id = 1;
-        $this->user->role = 'user';
+        $this->user->roles = 'user';
         $this->user->permissions = collect([
             (object)[
                 'user_id' => 1,
