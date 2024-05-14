@@ -2,8 +2,8 @@
 
 namespace Dlnsk\HierarchicalRBAC\Tests;
 
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
 
 class ViewsTest extends TestCase
 {
@@ -35,7 +35,7 @@ class ViewsTest extends TestCase
      */
     public function bladeCompile($value, array $args = array())
     {
-        $generated = \Blade::compileString($value);
+        $generated = Blade::compileString($value);
 
         ob_start() and extract($args, EXTR_SKIP);
 
@@ -61,30 +61,12 @@ class ViewsTest extends TestCase
     }
 
 
-    /** @test */
-    public function view_role()
+    public function test_blade_role_directive()
     {
         $user = (object)[];
         $user->roles = 'manager';
-        \Auth::shouldReceive('check')->andReturn(true);
-        \Auth::shouldReceive('user')->andReturn($user);
-
-
-        $this->assertStringContainsString('general', $this->bladeCompile($this->template));
-        $this->assertStringNotContainsString('has_dummy', $this->bladeCompile($this->template));
-        $this->assertStringNotContainsString('has_user_role', $this->bladeCompile($this->template));
-        $this->assertStringContainsString('has_manager_role', $this->bladeCompile($this->template));
-        $this->assertStringContainsString('has_or_role_1', $this->bladeCompile($this->template));
-        $this->assertStringContainsString('has_or_role_2', $this->bladeCompile($this->template));
-    }
-
-    /** @test */
-    public function view_many_role()
-    {
-        $user = (object)[];
-        $user->roles = ['manager'];
-        \Auth::shouldReceive('check')->andReturn(true);
-        \Auth::shouldReceive('user')->andReturn($user);
+        Auth::shouldReceive('check')->andReturn(true);
+        Auth::shouldReceive('user')->andReturn($user);
 
 
         $this->assertStringContainsString('general', $this->bladeCompile($this->template));

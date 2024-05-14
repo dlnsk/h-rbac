@@ -6,6 +6,7 @@ use Dlnsk\HierarchicalRBAC\Contracts\PermissionsProvider;
 use Dlnsk\HierarchicalRBAC\Contracts\RolesProvider;
 use Dlnsk\HierarchicalRBAC\Providers\ArrayPermissionProvider;
 use Dlnsk\HierarchicalRBAC\Providers\EloquentRolesProvider;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
@@ -50,6 +51,13 @@ class HRBACServiceProvider extends ServiceProvider {
             ], 'config');
 
         }
+
+        Blade::if('role', function ($roles) {
+            $rolesProvider = resolve(RolesProvider::class, ['user' => auth()->user()]);
+            $user_roles = $rolesProvider->getUserRoles();
+
+            return auth()->check() && array_intersect($user_roles, explode("|", $roles));
+        });
     }
 
     /**
@@ -64,19 +72,6 @@ class HRBACServiceProvider extends ServiceProvider {
         Gate::before(function ($user, $ability, $arguments) {
             $permissionChecker = resolve(PermissionChecker::class, compact('user'));
             return $permissionChecker->check($ability, $arguments);
-        });
-
-        $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
-            $bladeCompiler->directive('role', function ($roles) {
-                return '<?php
-                    $__many_roles  = config("h-rbac.manyRolesAttribute");
-                    $__single_role = config("h-rbac.singleRoleAttribute", "role");
-                    $__user_roles = Arr::wrap(auth()->user()->$__single_role ?? null) ?: Arr::wrap(auth()->user()->$__many_roles ?? null);
-                    if(auth()->check() && array_intersect($__user_roles, explode("|", '.$roles.'))): ?>';
-            });
-            $bladeCompiler->directive('endrole', function () {
-                return '<?php endif; ?>';
-            });
         });
     }
 
