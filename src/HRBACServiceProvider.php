@@ -41,14 +41,17 @@ class HRBACServiceProvider extends ServiceProvider {
 
             // Register your migration's publisher
             $this->publishes([
-                __DIR__ . '/../database/migrations/add_role_field_to_users.stub'
-                                => database_path('migrations/' . date('Y_m_d_His', time()) . '_add_role_field_to_users.php'),
-            ], 'migrations');
+                __DIR__ . '/../database/migrations/add_permissions_table.stub'
+                                => database_path('migrations/' . date('Y_m_d_His', time()) . '_add_permissions_table.php'),
+            ], 'hrbac-migrations');
 
             // Publish your config
             $this->publishes([
                 __DIR__.'/../config/config.php' => config_path($this->packageName.'.php'),
-            ], 'config');
+            ], 'hrbac-config');
+            $this->publishes([
+                __DIR__.'/../Policies/' => app_path('Policies'),
+            ], 'hrbac-config');
 
         }
 
