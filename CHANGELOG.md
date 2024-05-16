@@ -4,6 +4,13 @@ All Notable changes to `h-rbac` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## [1.0.0] - 2024-05-14
+### Changed
+- The module was fully rewritten with policy support
+
+### Added
+- Ability to use user's extra permission from DB
+
 ## [0.4.3] - 2023-12-08
 ### Fixed
 - Small type fix

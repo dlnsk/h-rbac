@@ -8,23 +8,31 @@
 
 
     /**
-     * Name of class which contain list of roles and permissions
+     * Name of User model attribute that gives one role or array of roles
      */
 
-    'rbacClass' => App\Classes\Authorization\AuthorizationClass::class,
+    'userRolesAttribute' => 'roles',
+
 
     /**
-     * Name of User model attribute that gives single role of user
-     * if you DON'T use many-to-many relationship
+     * Name of User model attribute that gives array of extra permissions.
      */
+    'permissionsAttribute' => 'permissions',
 
-    'singleRoleAttribute' => 'role',
 
     /**
-     * Name of User model attribute that gives array of roles
-     * if you use many-to-many relationship
+     * Built-in application roles and its permissions
      */
-
-    'userRolesAttribute' => 'own_roles',
+    'builtinRoles' => [
+        'manager' => [
+            'editAnyPost',
+            'deleteAnyPost',
+            'listAnyReports',
+        ],
+        'user' => [
+            'editOwnPost',
+            'listEducationReports',
+        ],
+    ],
 
 ];

@@ -1,6 +1,13 @@
 <?php
 namespace Dlnsk\HierarchicalRBAC;
 
+use Dlnsk\HierarchicalRBAC\Contracts\PermissionChecker;
+use Dlnsk\HierarchicalRBAC\Contracts\PermissionsProvider;
+use Dlnsk\HierarchicalRBAC\Contracts\RolesProvider;
+use Dlnsk\HierarchicalRBAC\Providers\ArrayPermissionProvider;
+use Dlnsk\HierarchicalRBAC\Providers\EloquentRolesProvider;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 
@@ -17,6 +24,12 @@ class HRBACServiceProvider extends ServiceProvider {
      */
     protected $packageName = 'h-rbac';
 
+    public $bindings = [
+        PermissionChecker::class => CommonPermissionChecker::class,
+        RolesProvider::class => EloquentRolesProvider::class,
+        PermissionsProvider::class => ArrayPermissionProvider::class,
+    ];
+
     /**
      * Bootstrap the application services.
      *
@@ -28,17 +41,26 @@ class HRBACServiceProvider extends ServiceProvider {
 
             // Register your migration's publisher
             $this->publishes([
-                __DIR__ . '/../database/migrations/add_role_field_to_users.stub'
-                                => database_path('migrations/' . date('Y_m_d_His', time()) . '_add_role_field_to_users.php'),
-            ], 'migrations');
+                __DIR__ . '/../database/migrations/add_permissions_table.stub'
+                                => database_path('migrations/' . date('Y_m_d_His', time()) . '_add_permissions_table.php'),
+            ], 'hrbac-migrations');
 
             // Publish your config
             $this->publishes([
                 __DIR__.'/../config/config.php' => config_path($this->packageName.'.php'),
-                __DIR__.'/../classes/AuthorizationClass.php' => app_path('Classes/Authorization/AuthorizationClass.php'),
-            ], 'config');
+            ], 'hrbac-config');
+            $this->publishes([
+                __DIR__.'/../Policies/' => app_path('Policies'),
+            ], 'hrbac-config');
 
         }
+
+        Blade::if('role', function ($roles) {
+            $rolesProvider = resolve(RolesProvider::class, ['user' => auth()->user()]);
+            $user_roles = $rolesProvider->getUserRoles();
+
+            return auth()->check() && array_intersect($user_roles, explode("|", $roles));
+        });
     }
 
     /**
@@ -50,23 +72,9 @@ class HRBACServiceProvider extends ServiceProvider {
     {
         $this->mergeConfigFrom( __DIR__.'/../config/config.php', $this->packageName);
 
-        \Gate::before(function ($user, $ability, $arguments) {
-            $class = config($this->packageName.'.rbacClass');
-            $rbac = new $class();
-            return $rbac->checkPermission($user, $ability, $arguments);
-        });
-
-        $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
-            $bladeCompiler->directive('role', function ($roles) {
-                return '<?php
-                    $__many_roles  = config("h-rbac.userRolesAttribute");
-                    $__single_role = config("h-rbac.singleRoleAttribute", "role");
-                    $__user_roles = Arr::wrap(auth()->user()->$__single_role ?? null) ?: Arr::wrap(auth()->user()->$__many_roles ?? null);
-                    if(auth()->check() && array_intersect($__user_roles, explode("|", '.$roles.'))): ?>';
-            });
-            $bladeCompiler->directive('endrole', function () {
-                return '<?php endif; ?>';
-            });
+        Gate::before(function ($user, $ability, $arguments) {
+            $permissionChecker = resolve(PermissionChecker::class, compact('user'));
+            return $permissionChecker->check($ability, $arguments);
         });
     }
 
