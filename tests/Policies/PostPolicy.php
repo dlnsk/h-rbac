@@ -27,9 +27,9 @@ class PostPolicy
     }
 
     /**
-     * Permission model contain post's id which allowed to edit to this user.
+     * Permissions variable contains collection with post ids which allowed to edit to this user.
      */
-    public function editFixedPost($authorizedUser, $post, $permission): bool {
-        return $post->id === $permission->value;
+    public function editFixedPost($authorizedUser, $post, $permissions): bool {
+        return $permissions->contains('value', $post->id);
     }
 }

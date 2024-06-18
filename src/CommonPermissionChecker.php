@@ -4,6 +4,8 @@ namespace Dlnsk\HierarchicalRBAC;
 
 use Dlnsk\HierarchicalRBAC\Contracts\PermissionsProvider;
 use Dlnsk\HierarchicalRBAC\Contracts\RolesProvider;
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
@@ -26,6 +28,14 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
         $this->permissionsProvider = resolve(PermissionsProvider::class, compact('user'));
     }
 
+    /**
+     * Make some preparation for checking ability.
+     *
+     * @param string $ability   The head ability whose chain we are checking
+     * @param mixed $arguments  Additional arguments for checking (model, policy and any other data)
+     * @return bool|null
+     * @throws BindingResolutionException
+     */
     public function check($ability, $arguments)
     {
         $user_roles = $this->rolesProvider->getUserRoles();
@@ -48,7 +58,11 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
     /**
      * Checking permission for chose user
      *
+     * @param Collection $user_permissions  Set of permissions that user has. Structure is [<permission_name> => <collection of permissions> or NULL, ...]
+     * @param string $ability               The head ability whose chain we are checking
+     * @param mixed $arguments              Additional arguments for checking (model, policy and any other data)
      * @return boolean
+     * @throws BindingResolutionException
      */
     public function checkAbility($user_permissions, $ability, $arguments)
     {
@@ -69,7 +83,7 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
         }
 
         $chain = $policyWrp->getChainFor($ability);
-        $permission_intersection = array_intersect_key($user_permissions, array_fill_keys($chain, null));
+        $permission_intersection = $user_permissions->intersectByKeys(array_fill_keys($chain, null));
         foreach ($permission_intersection as $permission => $value) {
             $callback_name = $policyWrp->getCallbackName($permission);
             if ($callback_name) {

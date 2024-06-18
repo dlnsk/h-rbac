@@ -95,4 +95,33 @@ class EloquentPermissionsTest extends TestCase
         $this->assertTrue(Gate::forUser($this->user)->allows('edit', $this->post));
     }
 
+    public function test_user_can_edit_number_concrete_posts()
+    {
+        $this->user->id = 1;
+        $this->user->roles = 'user';
+        $this->user->permissions = collect([
+            (object)[
+                'user_id' => 1,
+                'name' => 'editFixedPost',
+                'action' => 'include',
+                'value' => 5,
+            ],
+            (object)[
+                'user_id' => 1,
+                'name' => 'editFixedPost',
+                'action' => 'include',
+                'value' => 44,
+            ],
+        ]);
+        $this->post->id = 5;
+        $this->post->user_id = 999;
+
+        $this->assertTrue(Gate::forUser($this->user)->allows('edit', $this->post));
+
+
+        $this->post->id = 44;
+
+        $this->assertTrue(Gate::forUser($this->user)->allows('edit', $this->post));
+    }
+
 }
