@@ -14,9 +14,11 @@ class AddPermissionsTable extends Migration
     {
         Schema::create('permissions', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('user_id')->index();
-            $table->string('name');
-            $table->string('value');
+            $table->bigInteger('user_id')->index();     // User who owns the permission.
+            $table->string('name')->index();            // Name of permission.
+            $table->string('action', 10)->index();      // What to do with permission, 'include' or 'exclude'?
+            $table->string('value');                    // Not required. May have any type, any name.
+                                                        // You can add any number of additional fields.
         });
     }
 
