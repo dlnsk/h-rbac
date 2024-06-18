@@ -15,7 +15,7 @@ class ReportPolicy
     ];
 
 
-    public function listEducationReports($user, $args): bool {
+    public function listEducationReports($authorizedUser, $args): bool {
         return $args['kind'] === 'edu';
     }
 }
