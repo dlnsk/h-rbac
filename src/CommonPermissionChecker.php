@@ -52,7 +52,11 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
      */
     public function checkAbility($user_permissions, $ability, $arguments)
     {
-        $arg1 = head($arguments);
+        if (isset($arguments['policy'])) {
+            $arg1 = $arguments['policy'];
+        } else {
+            $arg1 = head($arguments);
+        }
         $policy = Gate::getPolicyFor($arg1);
         // Allow to use policy's classes in Gate, not just models
         if (!$policy && class_exists($arg1) && Str::endsWith($arg1, 'Policy')) {

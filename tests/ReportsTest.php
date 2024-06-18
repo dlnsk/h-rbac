@@ -23,6 +23,20 @@ class ReportsTest extends TestCase
         $this->assertTrue(Gate::forUser($this->user)->allows('list', ReportPolicy::class));
     }
 
+    public function test_user_has_permission_with_no_model_and_policy_class_as_first_value()
+    {
+        $this->user->roles = 'manager';
+
+        $this->assertTrue(Gate::forUser($this->user)->allows('list', [ReportPolicy::class, 'something' => 'dummy']));
+    }
+
+    public function test_user_has_permission_with_no_model_and_policy_class_with_key()
+    {
+        $this->user->roles = 'manager';
+
+        $this->assertTrue(Gate::forUser($this->user)->allows('list', ['something' => 'dummy', 'policy' => ReportPolicy::class]));
+    }
+
     public function test_user_has_permission_with_no_model_and_callback()
     {
         $this->user->roles = 'user';
