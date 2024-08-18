@@ -77,6 +77,45 @@ class EloquentPermissionsTest extends TestCase
         $this->assertFalse(Gate::forUser($this->user)->allows('delete', $this->post));
     }
 
+    public function test_user_has_edit_concrete_permission_but_without_value_in_db() {
+        app()['config']->set('h-rbac.builtinRoles', [
+            'mentor' => [
+                'editFixedPost',
+            ],
+        ]);
+
+        $this->user->id = 1;
+        $this->user->roles = 'mentor';
+        $this->user->permissions = collect(); // No value in db to allow to edit post with id=5
+        $this->post->id = 5;
+        $this->post->user_id = 999;
+
+        $this->assertFalse(Gate::forUser($this->user)->allows('edit', $this->post));
+    }
+
+    public function test_user_has_edit_concrete_permission_and_value_in_db() {
+        app()['config']->set('h-rbac.builtinRoles', [
+            'mentor' => [
+                'editFixedPost',
+            ],
+        ]);
+
+        $this->user->id = 1;
+        $this->user->roles = 'mentor';
+        $this->user->permissions = collect([
+            (object)[
+                'user_id' => 1,
+                'name' => 'editFixedPost',
+                'action' => 'include',
+                'value' => 5,
+            ],
+        ]);
+        $this->post->id = 5;
+        $this->post->user_id = 999;
+
+        $this->assertTrue(Gate::forUser($this->user)->allows('edit', $this->post));
+    }
+
     public function test_user_can_edit_concrete_post()
     {
         $this->user->id = 1;

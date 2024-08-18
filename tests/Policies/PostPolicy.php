@@ -28,8 +28,9 @@ class PostPolicy
 
     /**
      * Permissions variable contains collection with post ids which allowed to edit to this user.
+     * If there aren't any records, it contains null.
      */
     public function editFixedPost($authorizedUser, $post, $permissions): bool {
-        return $permissions->contains('value', $post->id);
+        return $permissions && $permissions->contains('value', $post->id);
     }
 }
