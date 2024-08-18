@@ -1,9 +1,12 @@
 <?php
+namespace Dlnsk\HierarchicalRBAC\Tests;
 
-
+use Dlnsk\HierarchicalRBAC\PermissionService;
 use Dlnsk\HierarchicalRBAC\PolicyWrapper;
+use Mockery\MockInterface;
 
-class PolicyTest extends \Dlnsk\HierarchicalRBAC\Tests\TestCase
+
+class PolicyTest extends TestCase
 {
     protected $wrapper;
 
@@ -66,5 +69,25 @@ class PolicyTest extends \Dlnsk\HierarchicalRBAC\Tests\TestCase
         $chain = $this->wrapper->getChainFor('a1');
 
         $this->assertSame(['a1'], $chain);
+    }
+
+    public function test_getting_permission_chains_from_all_policies()
+    {
+        $this->partialMock(PermissionService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getBuiltInPolicies')->andReturn(collect([
+                "Dlnsk\HierarchicalRBAC\Tests\Policies\PostPolicy",
+                "Dlnsk\HierarchicalRBAC\Tests\Policies\ReportPolicy",
+            ]));
+        });
+
+        $service = app(PermissionService::class);
+        $permissions = $service->getBuiltInPermissions();
+
+
+        $this->assertCount(2, $permissions);
+        $this->assertArrayHasKey('PostPolicy', $permissions);
+        $this->assertArrayHasKey('ReportPolicy', $permissions);
+        $this->assertArrayHasKey('edit', $permissions['PostPolicy']);
+        $this->assertCount(3, $permissions['PostPolicy']['edit']);
     }
 }

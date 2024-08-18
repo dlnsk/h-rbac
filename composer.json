@@ -11,6 +11,7 @@
         }
     ],
     "require": {
+        "facade/ignition": "^1.16.15",
         "laravel/framework": "~5.7|>=6.0"
     },
     "require-dev": {
