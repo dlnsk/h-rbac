@@ -14,13 +14,28 @@ class EloquentPermissionProvider extends ArrayPermissionProvider
         $this->user = $user;
     }
 
+    public function getRolesPermissions(array $roles): Collection
+    {
+        return parent::getPermissions($roles);
+    }
+
+    public function getExtraPermissions(): Collection
+    {
+        $permissions_attr = config("h-rbac.permissionsAttribute");
+        if (isset($this->user->$permissions_attr) && $this->user->$permissions_attr->count()) {
+            return $this->user->$permissions_attr;
+        } else {
+            return collect();
+        }
+    }
+
     public function getPermissions(array $roles): Collection
     {
-        $role_permissions = parent::getPermissions($roles);
-        $permissions_attr = config("h-rbac.permissionsAttribute");
+        $role_permissions = $this->getRolesPermissions($roles);
         $user_permissions = collect($role_permissions);
-        if (isset($this->user->$permissions_attr) && $this->user->$permissions_attr->count()) {
-            $groups = $this->user->$permissions_attr->groupBy(['action', 'name']);
+        $extra_permissions = $this->getExtraPermissions();
+        if ($extra_permissions->count()) {
+            $groups = $extra_permissions->groupBy(['action', 'name']);
             $user_permissions = $user_permissions->merge(
                 $groups->get('include')
             );
