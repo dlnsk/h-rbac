@@ -51,4 +51,11 @@ class PermissionService
 
         return $permissionsProvider->getPermissions($user_roles);
     }
+
+    public function getUserExtraPermissions($user): Collection
+    {
+        $permissionsProvider = resolve(PermissionsProvider::class, compact('user'));
+
+        return $permissionsProvider->getExtraPermissions();
+    }
 }

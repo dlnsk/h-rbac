@@ -14,4 +14,11 @@ interface PermissionsProvider
      *                      Collection is null if permission objects unavailable (user has permission without any additional data).
      */
     public function getPermissions(array $roles): Collection;
+
+    /**
+     * Take a raw list of changed permissions (included or excluded).
+     *
+     * @return Collection
+     */
+    public function getExtraPermissions(): Collection;
 }

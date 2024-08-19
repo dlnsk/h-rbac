@@ -11,6 +11,11 @@ class ArrayPermissionProvider implements Contracts\PermissionsProvider
     {
     }
 
+    public function getExtraPermissions(): Collection
+    {
+        return collect();
+    }
+
     public function getPermissions(array $roles): Collection
     {
         $app_roles = config('h-rbac.builtinRoles');
