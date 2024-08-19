@@ -2,6 +2,8 @@
 
 namespace Dlnsk\HierarchicalRBAC;
 
+use Dlnsk\HierarchicalRBAC\Contracts\PermissionsProvider;
+use Dlnsk\HierarchicalRBAC\Contracts\RolesProvider;
 use Facade\Ignition\Support\ComposerClassMap;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -31,5 +33,22 @@ class PermissionService
         }
 
         return $permissions;
+    }
+
+    public function getUserRoles($user): array
+    {
+        $rolesProvider = resolve(RolesProvider::class, compact('user'));
+        $user_roles = $rolesProvider->getUserRoles();
+        $application_roles = $rolesProvider->getApplicationRoles();
+
+        return array_intersect($application_roles, $user_roles);
+    }
+
+    public function getUserPermissions($user): Collection
+    {
+        $permissionsProvider = resolve(PermissionsProvider::class, compact('user'));
+        $user_roles = $this->getUserRoles($user);
+
+        return $permissionsProvider->getPermissions($user_roles);
     }
 }
