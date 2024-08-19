@@ -2,10 +2,11 @@
 
 namespace Dlnsk\HierarchicalRBAC\Providers;
 
-use Dlnsk\HierarchicalRBAC\Contracts;
+use Dlnsk\HierarchicalRBAC\Contracts\PermissionsProvider;
+use Dlnsk\HierarchicalRBAC\Contracts\RolesProvider;
 use Illuminate\Support\Collection;
 
-class ArrayPermissionProvider implements Contracts\PermissionsProvider
+class ArrayPermissionProvider implements PermissionsProvider
 {
     public function __construct($user)
     {
@@ -18,12 +19,8 @@ class ArrayPermissionProvider implements Contracts\PermissionsProvider
 
     public function getPermissions(array $roles): Collection
     {
-        $app_roles = config('h-rbac.builtinRoles');
-        $user_permissions = [];
-        foreach ($roles as $role_name) {
-            $user_permissions = array_merge($user_permissions, $app_roles[$role_name]);
-        }
+        $rolesProvider = resolve(RolesProvider::class);
 
-        return collect(array_fill_keys($user_permissions, null));
+        return $rolesProvider->getRolesPermissions($roles);
     }
 }

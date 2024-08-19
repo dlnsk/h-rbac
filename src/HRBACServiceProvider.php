@@ -5,11 +5,10 @@ use Dlnsk\HierarchicalRBAC\Contracts\PermissionChecker;
 use Dlnsk\HierarchicalRBAC\Contracts\PermissionsProvider;
 use Dlnsk\HierarchicalRBAC\Contracts\RolesProvider;
 use Dlnsk\HierarchicalRBAC\Providers\ArrayPermissionProvider;
-use Dlnsk\HierarchicalRBAC\Providers\EloquentRolesProvider;
+use Dlnsk\HierarchicalRBAC\Providers\ArrayRolesProvider;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\View\Compilers\BladeCompiler;
 
 /**
  * Based on native Laravel's abilities. Hierarchical RBAC with callbacks.
@@ -26,7 +25,7 @@ class HRBACServiceProvider extends ServiceProvider {
 
     public $bindings = [
         PermissionChecker::class => CommonPermissionChecker::class,
-        RolesProvider::class => EloquentRolesProvider::class,
+        RolesProvider::class => ArrayRolesProvider::class,
         PermissionsProvider::class => ArrayPermissionProvider::class,
     ];
 
@@ -56,8 +55,8 @@ class HRBACServiceProvider extends ServiceProvider {
         }
 
         Blade::if('role', function ($roles) {
-            $rolesProvider = resolve(RolesProvider::class, ['user' => auth()->user()]);
-            $user_roles = $rolesProvider->getUserRoles();
+            $rolesProvider = resolve(RolesProvider::class);
+            $user_roles = $rolesProvider->getUserRoles(auth()->user());
 
             return auth()->check() && array_intersect($user_roles, explode("|", $roles));
         });

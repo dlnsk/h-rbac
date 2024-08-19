@@ -37,8 +37,8 @@ class PermissionService
 
     public function getUserRoles($user): array
     {
-        $rolesProvider = resolve(RolesProvider::class, compact('user'));
-        $user_roles = $rolesProvider->getUserRoles();
+        $rolesProvider = resolve(RolesProvider::class);
+        $user_roles = $rolesProvider->getUserRoles($user);
         $application_roles = $rolesProvider->getApplicationRoles();
 
         return array_intersect($application_roles, $user_roles);
@@ -50,6 +50,13 @@ class PermissionService
         $user_roles = $this->getUserRoles($user);
 
         return $permissionsProvider->getPermissions($user_roles);
+    }
+
+    public function getRolesPermissions($roles): Collection
+    {
+        $rolesProvider = resolve(RolesProvider::class);
+
+        return $rolesProvider->getRolesPermissions($roles);
     }
 
     public function getUserExtraPermissions($user): Collection

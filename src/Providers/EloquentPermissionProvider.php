@@ -14,11 +14,6 @@ class EloquentPermissionProvider extends ArrayPermissionProvider
         $this->user = $user;
     }
 
-    public function getRolesPermissions(array $roles): Collection
-    {
-        return parent::getPermissions($roles);
-    }
-
     public function getExtraPermissions(): Collection
     {
         $permissions_attr = config("h-rbac.permissionsAttribute");
@@ -31,7 +26,7 @@ class EloquentPermissionProvider extends ArrayPermissionProvider
 
     public function getPermissions(array $roles): Collection
     {
-        $role_permissions = $this->getRolesPermissions($roles);
+        $role_permissions = parent::getPermissions($roles);
         $user_permissions = collect($role_permissions);
         $extra_permissions = $this->getExtraPermissions();
         if ($extra_permissions->count()) {

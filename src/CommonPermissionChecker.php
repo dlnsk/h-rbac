@@ -12,9 +12,9 @@ use Illuminate\Support\Str;
 class CommonPermissionChecker implements Contracts\PermissionChecker
 {
     /**
-     * @var RolesProvider
+     * @var PermissionService
      */
-    private $rolesProvider;
+    private $permissionService;
     /**
      * @var PermissionsProvider
      */
@@ -24,7 +24,7 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
     public function __construct($user)
     {
         $this->user = $user;
-        $this->rolesProvider = resolve(RolesProvider::class, compact('user'));
+        $this->permissionService = resolve(PermissionService::class);
         $this->permissionsProvider = resolve(PermissionsProvider::class, compact('user'));
     }
 
@@ -38,19 +38,12 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
      */
     public function check($ability, $arguments)
     {
-        $user_roles = $this->rolesProvider->getUserRoles();
-
-        if (in_array('admin', $user_roles)) {
-            return true;
-        }
-
-        $application_roles = $this->rolesProvider->getApplicationRoles();
-        $roles_intersection = array_intersect($application_roles, $user_roles);
-        if (!count($roles_intersection)) {
+        $user_roles = $this->permissionService->getUserRoles($this->user);
+        if (!count($user_roles)) {
             // User has no application's built-in roles
             return null;
         }
-        $user_permissions = $this->permissionsProvider->getPermissions($roles_intersection);
+        $user_permissions = $this->permissionsProvider->getPermissions($user_roles);
 
         return $this->checkAbility($user_permissions, $ability, $arguments);
     }

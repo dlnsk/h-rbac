@@ -53,18 +53,18 @@ class RolesTest extends TestCase
     public function test_roles_provider_gives_array_from_one_role()
     {
         $this->user->roles = 'manager';
-        $rolesProvider = resolve(RolesProvider::class, ['user' => $this->user]);
+        $rolesProvider = resolve(RolesProvider::class);
 
-        $this->assertIsArray($rolesProvider->getUserRoles());
-        $this->assertSame(['manager'], $rolesProvider->getUserRoles());
+        $this->assertIsArray($rolesProvider->getUserRoles($this->user));
+        $this->assertSame(['manager'], $rolesProvider->getUserRoles($this->user));
     }
 
     public function test_roles_provider_gives_array_from_many_role()
     {
         $this->user->roles = ['user', 'manager'];
-        $rolesProvider = resolve(RolesProvider::class, ['user' => $this->user]);
+        $rolesProvider = resolve(RolesProvider::class);
 
-        $this->assertIsArray($rolesProvider->getUserRoles());
-        $this->assertSame(['user', 'manager'], $rolesProvider->getUserRoles());
+        $this->assertIsArray($rolesProvider->getUserRoles($this->user));
+        $this->assertSame(['user', 'manager'], $rolesProvider->getUserRoles($this->user));
     }
 }

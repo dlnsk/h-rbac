@@ -21,4 +21,5 @@ interface PermissionsProvider
      * @return Collection
      */
     public function getExtraPermissions(): Collection;
+
 }
