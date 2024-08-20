@@ -25,7 +25,7 @@ class ArrayRolesProvider implements Contracts\RolesProvider
         $app_roles = config('h-rbac.builtinRoles');
         $user_permissions = [];
         foreach ($roles as $role_name) {
-            $user_permissions = array_merge($user_permissions, $app_roles[$role_name]);
+            $user_permissions = array_merge($user_permissions, $app_roles[$role_name] ?? []);
         }
 
         return collect(array_fill_keys($user_permissions, null));
