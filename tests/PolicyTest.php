@@ -90,4 +90,23 @@ class PolicyTest extends TestCase
         $this->assertArrayHasKey('edit', $permissions['PostPolicy']);
         $this->assertCount(3, $permissions['PostPolicy']['edit']);
     }
+
+    public function test_takes_a_policy_name_by_permission()
+    {
+        $this->partialMock(PermissionService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getBuiltInPolicies')->andReturn(collect([
+                "Dlnsk\HierarchicalRBAC\Tests\Policies\PostPolicy",
+                "Dlnsk\HierarchicalRBAC\Tests\Policies\ReportPolicy",
+            ]));
+        });
+        $service = app(PermissionService::class);
+
+
+        $post_policy_name = $service->getPolicyNameByPermission('editOwnPost');
+        $report_policy_name = $service->getPolicyNameByPermission('manageReports');
+
+
+        $this->assertSame('PostPolicy', $post_policy_name);
+        $this->assertSame('ReportPolicy', $report_policy_name);
+    }
 }

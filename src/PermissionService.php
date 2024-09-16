@@ -35,6 +35,23 @@ class PermissionService
         return $permissions;
     }
 
+    public function getPolicyNameByPermission($permission_name)
+    {
+        $permissions = $this->getBuiltInPermissions();
+
+        return $permissions
+            ->map(function ($item, $key) use ($permission_name) {
+                $permission_list = collect($item)->flatten();
+                if ($permission_list->contains($permission_name)) {
+                    return true;
+                }
+                return null;
+            })
+            ->filter()
+            ->keys()
+            ->first();
+    }
+
     public function getUserRoles($user): array
     {
         $rolesProvider = resolve(RolesProvider::class);

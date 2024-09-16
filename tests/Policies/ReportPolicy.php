@@ -12,6 +12,7 @@ class ReportPolicy
             'listAnyReports',
             'listEducationReports',
         ],
+        'manageReports',
     ];
 
 
