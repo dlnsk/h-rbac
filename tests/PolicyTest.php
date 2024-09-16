@@ -109,4 +109,22 @@ class PolicyTest extends TestCase
         $this->assertSame('PostPolicy', $post_policy_name);
         $this->assertSame('ReportPolicy', $report_policy_name);
     }
+
+    public function test_takes_available_permission_params()
+    {
+        $this->partialMock(PermissionService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getBuiltInPolicies')->andReturn(collect([
+                "Dlnsk\HierarchicalRBAC\Tests\Policies\PostPolicy",
+            ]));
+        });
+        $service = app(PermissionService::class);
+
+
+        $params_fixed = $service->getPermissionParams('editFixedPost');
+        $params_own = $service->getPermissionParams('editOwnPost');
+
+
+        $this->assertSame('##_number_##', $params_fixed);
+        $this->assertNull($params_own);
+    }
 }

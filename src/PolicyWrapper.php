@@ -21,16 +21,21 @@ class PolicyWrapper
             ->contains($ability);
     }
 
-    public function getCallbackName($permission)
+    public function getCallbackName($permission, $suffix = '')
     {
         $methods = get_class_methods($this->policy);
-        $callback_name = Str::camel($permission);
+        $callback_name = Str::camel($permission) . $suffix;
         return in_array($callback_name, $methods) ? $callback_name : false;
     }
 
     public function call($callback_name, $user, $arg, $permission_values, $ability): bool
     {
         return $this->policy->$callback_name($user, $arg, $permission_values, $ability);
+    }
+
+    public function simpleCall($callback_name)
+    {
+        return $this->policy->$callback_name();
     }
 
     public function isValid(): bool

@@ -52,6 +52,24 @@ class PermissionService
             ->first();
     }
 
+    public function getPermissionParams($permission_name)
+    {
+        $policy_name = $this->getPolicyNameByPermission($permission_name);
+        $policy_FQN = $this->getBuiltInPolicies()
+            ->first(function ($item) use ($policy_name) {
+                return Str::endsWith($item, $policy_name);
+            });
+
+        $policy = app()->make($policy_FQN);
+        $policyWrp = new PolicyWrapper($policy);
+        $callback_name = $policyWrp->getCallbackName($permission_name, 'Params');
+        if ($callback_name) {
+            return $policyWrp->simpleCall($callback_name);
+        }
+
+        return null;
+    }
+
     public function getUserRoles($user): array
     {
         $rolesProvider = resolve(RolesProvider::class);
