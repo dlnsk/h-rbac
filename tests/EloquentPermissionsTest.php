@@ -116,6 +116,9 @@ class EloquentPermissionsTest extends TestCase
         $this->assertTrue(Gate::forUser($this->user)->allows('edit', $this->post));
     }
 
+    // Here the user has no permission in role, but it's included through the db record.
+    // In general, you don't have to add permission like this in roles, because in some (very rare) sorts
+    // it may prevent users who have "more wide" rights in other roles they have.
     public function test_user_can_edit_concrete_post()
     {
         $this->user->id = 1;

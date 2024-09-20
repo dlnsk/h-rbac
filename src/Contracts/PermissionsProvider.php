@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 interface PermissionsProvider
 {
     /**
-     * Take a full list of user permissions.
+     * Gets the full list of user permissions.
      *
      * @param array $roles
      * @return Collection   The structure is [<permission_name> => <collection of permissions> or NULL, ...].
@@ -16,7 +16,7 @@ interface PermissionsProvider
     public function getPermissions(array $roles): Collection;
 
     /**
-     * Take a raw list of changed permissions (included or excluded).
+     * Gets the raw list of changed permissions (included or excluded).
      *
      * @return Collection
      */
