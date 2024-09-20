@@ -33,4 +33,15 @@ class PostPolicy
     public function editFixedPost($authorizedUser, $post, $permissions): bool {
         return $permissions && $permissions->contains('value', $post->id);
     }
+
+    /**
+     * Tells to backend to add UI element like select or input with appropriate value(s) for this permission.
+     * Feel free to return any value that you want. You can also return type of input (as you see here).
+     * This kind of method should have postfix 'Params'.
+     *
+     * @return string
+     */
+    public function editFixedPostParams() {
+        return '##_number_##';
+    }
 }
