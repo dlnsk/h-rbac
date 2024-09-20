@@ -139,8 +139,8 @@ with an overridden permission. Here is the example:
 Let's add the callback in `PostPolicy`.
 
 ``` php
-public function editPostInCategory($user, $post, $permission): bool {
-    return $post->category_id === $permission->value;
+public function editPostInCategory($user, $post, $permissions): bool {
+    return $permissions && $permissions->contains('value', $post->category_id);
 }
 ```
 
@@ -164,7 +164,7 @@ as you wish. It's very flexible.
 
 ## Usage
 
-As I said `h-rbac` is wrapper for [authorization logic](https://laravel.com/docs/11.x/authorization#creating-policies)
+As I said `h-rbac` is a wrapper for [authorization logic](https://laravel.com/docs/11.x/authorization#creating-policies)
 since Laravel 5.1 to this time. So, you can use any features of it.
 
 ```php
@@ -213,7 +213,7 @@ $this->authorize('edit', $post);
 $this->authorize('create', Post::class);
 ```
 
-If your permission isn't linked to model you can use policy class as a place to search callback:
+If your permission isn't linked to model you can use policy class as a place to search the chain and callbacks:
 
 ```php
 $this->authorize('download', ReportPolicy::class);
@@ -247,8 +247,8 @@ class PostPolicy
         return $user->id === $post->user_id;
     }
 
-    public function editPostInCategory($user, $post, $permission): bool {
-        return $post->category_id === $permission->value;
+    public function editPostInCategory($user, $post, $permissions): bool {
+        return $permissions && $permissions->contains('value', $post->category_id);
     }
 }
 ```
@@ -263,6 +263,8 @@ We use next logic for checking permission: checking all permissions in chain one
   in chain)
 - **deny** if user hasn't any permission in chain
 - **deny** if callbacks of all user's permissions return **false**
+
+Keep in mind that you can define your own `PermissionChecker` to change this logic.
 
 ### Roles
 
