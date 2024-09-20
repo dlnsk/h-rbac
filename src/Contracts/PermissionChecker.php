@@ -9,5 +9,5 @@ interface PermissionChecker
      * @param mixed $arguments Additional arguments for checking (model, policy and any other data)
      * @return bool|null
      */
-    public function check($ability, $arguments);
+    public function check($ability, $arguments): ?bool;
 }

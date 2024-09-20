@@ -36,7 +36,7 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
      * @return bool|null
      * @throws BindingResolutionException
      */
-    public function check($ability, $arguments)
+    public function check($ability, $arguments): ?bool
     {
         $user_roles = $this->permissionService->getUserRoles($this->user);
         if (!count($user_roles)) {
@@ -54,10 +54,10 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
      * @param Collection $user_permissions  Set of permissions that user has. Structure is [<permission_name> => <collection of permissions> or NULL, ...]
      * @param string $ability               The head ability whose chain we are checking
      * @param mixed $arguments              Additional arguments for checking (model, policy and any other data)
-     * @return boolean
+     * @return bool|null
      * @throws BindingResolutionException
      */
-    public function checkAbility($user_permissions, $ability, $arguments)
+    public function checkAbility($user_permissions, $ability, $arguments): ?bool
     {
         if (isset($arguments['policy'])) {
             $arg1 = $arguments['policy'];

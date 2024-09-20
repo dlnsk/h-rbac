@@ -5,6 +5,7 @@ namespace Dlnsk\HierarchicalRBAC;
 use Dlnsk\HierarchicalRBAC\Contracts\PermissionsProvider;
 use Dlnsk\HierarchicalRBAC\Contracts\RolesProvider;
 use Facade\Ignition\Support\ComposerClassMap;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -52,16 +53,27 @@ class PermissionService
             ->first();
     }
 
-    public function getPermissionParams($permission_name)
+    /**
+     * @throws BindingResolutionException
+     */
+    public function getPolicyByPermission($permission_name): PolicyWrapper
     {
         $policy_name = $this->getPolicyNameByPermission($permission_name);
         $policy_FQN = $this->getBuiltInPolicies()
             ->first(function ($item) use ($policy_name) {
                 return Str::endsWith($item, $policy_name);
             });
-
         $policy = app()->make($policy_FQN);
-        $policyWrp = new PolicyWrapper($policy);
+
+        return new PolicyWrapper($policy);
+    }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    public function getPermissionParams($permission_name)
+    {
+        $policyWrp = $this->getPolicyByPermission($permission_name);
         $callback_name = $policyWrp->getCallbackName($permission_name, 'Params');
         if ($callback_name) {
             return $policyWrp->simpleCall($callback_name);
