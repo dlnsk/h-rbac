@@ -41,7 +41,7 @@ Add roles and its permissions to config file. That's all!
 
 ## Overview
 
-This module is wrapper for [authorization logic](https://laravel.com/docs/11.x/authorization#creating-policies) and
+This module is a wrapper for [authorization logic](https://laravel.com/docs/11.x/authorization#creating-policies) and
 control access to resources of Laravel 5.1 and later.
 
 **Let's describe the minimum required ability of RBAC** (in my opinion).
@@ -133,7 +133,7 @@ public $bindings = [
 ];
 ```
 
-Now every record in `permissions` table adds or removes one permission from user. You also can store additional value 
+Now every record in `permissions` table adds or removes one permission from user. You also can store additional value(s) 
 with an overridden permission. Here is the example:
 
 Let's add the callback in `PostPolicy`.
