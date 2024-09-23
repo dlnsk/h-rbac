@@ -52,7 +52,7 @@ class PolicyWrapper
         }
         // Try to find the ability among the permissions. This is a rare case to check permission inside a chain.
         foreach ($this->policy->chains as $chain) {
-            if (in_array($ability, $chain)) {
+            if (is_array($chain) && in_array($ability, $chain)) {
                 return [$ability];
             }
         }
