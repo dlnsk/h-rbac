@@ -14,7 +14,7 @@ should allow:
 - roles and permissions
 - callbacks for permissions (for passing parameters in permission checking)
 - permission's inheritance (to give different abilities to different roles)
-- optimal way to manage RBAC
+- an optimal way to manage RBAC
 
 ## Install
 
@@ -73,14 +73,14 @@ That's what you can do with Laravel's policies as it described in docs. But Lara
 
 ### Permission's inheritance
 
-As you see callbacks is very useful. But what about a site manager who may edit any posts? Create separate permission?
-But which of it we should check?
+As you see callbacks are very useful. But what about a site manager who may edit any posts? Create separate permission?
+But which of them we should check?
 
 Answer is to use chained (inherited) permissions. Example:
 
 `edit` -> `editAnyPost` -> `editPostInCategory` -> `editOwnPost`
 
-Each of this permission put in appropriate role, but **we always check the first** (except in very rare cases):
+Each of these permissions is placed into the appropriate role, but **in code we always check the first** (except in very rare cases):
 
 ``` php
 if (\Gate::can('edit', $post)) {
@@ -157,6 +157,11 @@ Now, if we add to `permissions` table next record
 
 we'll allow user with `id = 100` edit any post in category with `id = 5`.
 
+The word `exclude` may also be in `action` field. This takes away the ability from user. 
+If both actions exists in database, the `exclude` wins.
+
+The field `value` doesn't used by the module at all, so you can use any type for it or even a set of any extra fields.
+
 #### Different way
 
 Keep in mind that you can bind your own `RolesProvider` or/and `PermissionsProvider` and store roles and permissions
@@ -164,7 +169,7 @@ as you wish. It's very flexible.
 
 ## Usage
 
-As I said `h-rbac` is a wrapper for [authorization logic](https://laravel.com/docs/11.x/authorization#creating-policies)
+As we said `h-rbac` is a wrapper for [authorization logic](https://laravel.com/docs/11.x/authorization#creating-policies)
 since Laravel 5.1 to this time. So, you can use any features of it.
 
 ```php
@@ -219,6 +224,18 @@ If your permission isn't linked to model you can use policy class as a place to 
 $this->authorize('download', ReportPolicy::class);
 ```
 
+and with additional parameters:
+
+```php
+$this->authorize('download', [ReportPolicy::class, 'current_date' => Carbon::now()]);
+```
+
+The policy class should be the first element in array or it may has a key:
+
+```php
+$this->authorize('download', ['current_date' => Carbon::now(), 'policy' => ReportPolicy::class]);
+```
+
 ## Configuration
 
 ### Permissions
@@ -256,13 +273,16 @@ class PostPolicy
 You should add callback only if you need additional check for this permission. **The name of callback should be
 camelcased name of permission.**
 
-We use next logic for checking permission: checking all permissions in chain one by one and:
+#### The logic of checking permissions
+
+We check all permissions in chain one by one and:
 
 - **allow** if user has a permission with no callback
-- **allow** if user has a permission and callback return **true** (in this case we don't check any remaining permission
-  in chain)
-- **deny** if user hasn't any permission in chain
+- **allow** if user has a permission and callback return **true**
+- **deny** if user don't have all permission in chain
 - **deny** if callbacks of all user's permissions return **false**
+
+If the check **allows** the user to do something, all remaining permission in chain will be pass.
 
 Keep in mind that you can define your own `PermissionChecker` to change this logic.
 
