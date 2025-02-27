@@ -3,7 +3,7 @@
 namespace Dlnsk\HierarchicalRBAC;
 
 use Dlnsk\HierarchicalRBAC\Contracts\PermissionsProvider;
-use Dlnsk\HierarchicalRBAC\Contracts\RolesProvider;
+use Dlnsk\HierarchicalRBAC\Exceptions\PermissionNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -56,6 +56,7 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
      * @param mixed $arguments              Additional arguments for checking (model, policy and any other data)
      * @return bool|null
      * @throws BindingResolutionException
+     * @throws PermissionNotFoundException
      */
     public function checkAbility($user_permissions, $ability, $arguments): ?bool
     {
@@ -72,7 +73,11 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
 
         $policyWrp = new PolicyWrapper($policy);
         if (!$policyWrp->isValid() || !$policyWrp->hasAbility($ability)) {
-            return null;
+            if (config('h-rbac.exceptIfPermissionNotFound', false)) {
+                throw new PermissionNotFoundException();
+            } else {
+                return null;
+            }
         }
 
         $chain = $policyWrp->getChainFor($ability);

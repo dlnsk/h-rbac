@@ -3,6 +3,7 @@
 namespace Dlnsk\HierarchicalRBAC\Tests;
 
 use Dlnsk\HierarchicalRBAC\Contracts\PermissionsProvider;
+use Dlnsk\HierarchicalRBAC\Exceptions\PermissionNotFoundException;
 use Dlnsk\HierarchicalRBAC\Providers\EloquentPermissionProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -58,4 +59,42 @@ class ConfigTest extends TestCase
         $this->assertTrue(Gate::forUser($this->user)->allows('delete', $this->post));
     }
 
+
+    public function test_rise_exception_on_unknown_permission()
+    {
+        app()['config']->set('h-rbac.exceptIfPermissionNotFound', true);
+        $this->expectException(PermissionNotFoundException::class);
+
+        $this->user->roles = 'manager';
+        $this->user->id = 1;
+        $this->post->user_id = 1;
+
+        $this->assertFalse(Gate::forUser($this->user)->allows('dummy', $this->post));
+    }
+
+
+    public function test_rise_exception_on_lost_permission()
+    {
+        app()['config']->set('h-rbac.exceptIfPermissionNotFound', true);
+        $this->expectException(PermissionNotFoundException::class);
+
+        $this->user->roles = 'manager';
+        $this->user->id = 1;
+        $this->post->user_id = 1;
+
+        // Didn't point to Model or Policy where permission is.
+        $this->assertTrue(Gate::forUser($this->user)->allows('editAnyPost'));
+    }
+
+    public function test_dont_rise_exception_on_unhandled_permission()
+    {
+        app()['config']->set('h-rbac.exceptIfPermissionNotFound', false);
+
+        $this->user->roles = 'manager';
+        $this->user->id = 1;
+        $this->post->user_id = 1;
+
+        $this->assertFalse(Gate::forUser($this->user)->allows('dummy', $this->post));
+        $this->assertFalse(Gate::forUser($this->user)->allows('editAnyPost'));
+    }
 }
