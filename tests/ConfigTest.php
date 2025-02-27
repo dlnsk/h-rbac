@@ -22,7 +22,7 @@ class ConfigTest extends TestCase
     public function test_new_name_for_many_roles_attribute()
     {
         app()['config']->set('h-rbac.userRolesAttribute', 'changedName');
-        $this->user->own_roles = ['manager'];
+        $this->user->roles = ['manager'];
 
         $this->assertFalse(Gate::forUser($this->user)->allows('delete', $this->post));
 
