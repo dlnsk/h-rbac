@@ -7,10 +7,21 @@ use Illuminate\Support\Str;
 class PolicyWrapper
 {
     private $policy;
+    /**
+     * @var boolean
+     */
+    private $skipCallbackChecking = false;
 
     public function __construct($policy)
     {
         $this->policy = $policy;
+    }
+
+    public function skipCallbackChecking(): self
+    {
+        $this->skipCallbackChecking = true;
+
+        return $this;
     }
 
     public function hasAbility($ability): bool
@@ -30,6 +41,9 @@ class PolicyWrapper
 
     public function call($callback_name, $user, $arg, $permission_values, $ability): bool
     {
+        if ($this->skipCallbackChecking) {
+            return true;
+        }
         return $this->policy->$callback_name($user, $arg, $permission_values, $ability);
     }
 

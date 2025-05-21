@@ -3,6 +3,7 @@
 namespace Dlnsk\HierarchicalRBAC;
 
 use Dlnsk\HierarchicalRBAC\Contracts\PermissionsProvider;
+use Dlnsk\HierarchicalRBAC\Contracts\PolicyBuilder;
 use Dlnsk\HierarchicalRBAC\Exceptions\PermissionNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Collection;
@@ -19,6 +20,10 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
      * @var PermissionsProvider
      */
     private $permissionsProvider;
+    /**
+     * @var PolicyBuilder
+     */
+    private $policyBuilder;
     private $user;
 
     public function __construct($user)
@@ -26,6 +31,11 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
         $this->user = $user;
         $this->permissionService = resolve(PermissionService::class);
         $this->permissionsProvider = resolve(PermissionsProvider::class, compact('user'));
+    }
+
+    public function setPolicyBuilder(PolicyBuilder $builder)
+    {
+        $this->policyBuilder = $builder;
     }
 
     /**
@@ -71,7 +81,7 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
             $policy = app()->make($arg1);
         }
 
-        $policyWrp = new PolicyWrapper($policy);
+        $policyWrp = $this->policyBuilder->createWrapper($policy);
         if (!$policyWrp->isValid() || !$policyWrp->hasAbility($ability)) {
             if (config('h-rbac.exceptIfPermissionNotFound', false)) {
                 throw new PermissionNotFoundException();

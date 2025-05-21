@@ -12,4 +12,6 @@ interface PermissionChecker
      * @return bool|null
      */
     public function check($ability, $arguments): ?bool;
+
+    public function setPolicyBuilder(PolicyBuilder $builder);
 }

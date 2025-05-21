@@ -73,6 +73,7 @@ class HRBACServiceProvider extends ServiceProvider {
 
         Gate::before(function ($user, $ability, $arguments) {
             $permissionChecker = resolve(PermissionChecker::class, compact('user'));
+            $permissionChecker->setPolicyBuilder(new PolicyNormalBuilder());
             return $permissionChecker->check($ability, $arguments);
         });
     }

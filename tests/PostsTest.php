@@ -2,6 +2,8 @@
 
 namespace Dlnsk\HierarchicalRBAC\Tests;
 
+use Dlnsk\HierarchicalRBAC\HRBACHelper;
+use Dlnsk\HierarchicalRBAC\Tests\Policies\PostPolicy;
 use Illuminate\Support\Facades\Gate;
 
 
@@ -117,6 +119,27 @@ class PostsTest extends TestCase
         $this->post->user_id = 2;
 
         $this->assertFalse(Gate::forUser($this->user)->allows('edit', $this->post));
+    }
+
+    public function test_user_has_any_permission_in_ability()
+    {
+        $this->user->roles = 'user';
+        $this->user->id = 1;
+        $this->post->user_id = 2;
+
+        $hrbacService = resolve(HRBACHelper::class);
+
+        $this->assertTrue($hrbacService->canUserTakeAbility($this->user, 'edit', PostPolicy::class));
+    }
+
+    public function test_user_has_no_permission_in_ability()
+    {
+        $this->user->roles = 'user';
+        $this->user->id = 1;
+
+        $hrbacService = resolve(HRBACHelper::class);
+
+        $this->assertFalse($hrbacService->canUserTakeAbility($this->user, 'delete', PostPolicy::class));
     }
 
 }
