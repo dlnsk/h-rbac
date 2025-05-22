@@ -9,6 +9,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - getUserRoles() now rises UserHasNoBuiltInRolesException. Backward compatible if you don't use this function directly
 
 ### Added
+- Configuration key that enables an exception to be raised if the permission is not found.
 - HRBACHelper class added and gives some useful information
 
 ## [1.0.0] - 2024-05-14

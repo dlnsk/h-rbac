@@ -62,7 +62,7 @@ class ConfigTest extends TestCase
 
     public function test_rise_exception_on_unknown_permission()
     {
-        app()['config']->set('h-rbac.exceptIfPermissionNotFound', true);
+        app()['config']->set('h-rbac.riseExceptionIfPermissionNotFound', true);
         $this->expectException(PermissionNotFoundException::class);
 
         $this->user->roles = 'manager';
@@ -75,7 +75,7 @@ class ConfigTest extends TestCase
 
     public function test_rise_exception_on_lost_permission()
     {
-        app()['config']->set('h-rbac.exceptIfPermissionNotFound', true);
+        app()['config']->set('h-rbac.riseExceptionIfPermissionNotFound', true);
         $this->expectException(PermissionNotFoundException::class);
 
         $this->user->roles = 'manager';
@@ -88,7 +88,7 @@ class ConfigTest extends TestCase
 
     public function test_dont_rise_exception_on_unhandled_permission()
     {
-        app()['config']->set('h-rbac.exceptIfPermissionNotFound', false);
+        app()['config']->set('h-rbac.riseExceptionIfPermissionNotFound', false);
 
         $this->user->roles = 'manager';
         $this->user->id = 1;

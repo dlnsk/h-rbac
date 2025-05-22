@@ -23,7 +23,7 @@
     /**
      * Allow to throw the exception if permission not found or if policy not pointed well.
      */
-    'exceptIfPermissionNotFound' => false,
+    'riseExceptionIfPermissionNotFound' => false,
 
 
     /**

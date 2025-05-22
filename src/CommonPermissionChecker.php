@@ -52,7 +52,7 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
         } catch (UserHasNoBuiltInRolesException $e) {
             return null;
         } catch (PermissionNotFoundException $e) {
-            if (config('h-rbac.exceptIfPermissionNotFound', false)) {
+            if (config('h-rbac.riseExceptionIfPermissionNotFound', false)) {
                 throw $e;
             } else {
                 return null;
