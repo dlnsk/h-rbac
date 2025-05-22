@@ -18,7 +18,7 @@ should allow:
 
 ## Install
 
-> Supports Laravel since v5.1 to the latest (11.\* and above).
+> Supports Laravel since v5.1 to the latest (12.\* and above).
 
 Via Composer
 
@@ -41,7 +41,7 @@ Add roles and its permissions to config file. That's all!
 
 ## Overview
 
-This module is a wrapper for [authorization logic](https://laravel.com/docs/11.x/authorization#creating-policies) and
+This module is a wrapper for [authorization logic](https://laravel.com/docs/12.x/authorization#creating-policies) and
 control access to resources of Laravel 5.1 and later.
 
 **Let's describe the minimum required ability of RBAC** (in my opinion).
@@ -55,8 +55,8 @@ It's clear.
 Very common situation is to allow user to change only his own posts. With this package it's simple:
 
 ``` php
-public function editOwnPost($user, $post) {
-    return $user->id === $post->user_id;
+public function editOwnPost($authorizedUser, $post) {
+    return $authorizedUser->id === $post->user_id;
 }
 ```
 
@@ -87,15 +87,14 @@ if (\Gate::can('edit', $post)) {
 }
 ```
 
-These permissions in the chain will be checked one by one until one of it will pass. In other case the ability will be
-rejected for this user. So, we have many permissions with different business logic but checking in the code only one.
+These permissions in the chain will be checked one by one until one of them will pass. In other case the ability will be
+rejected for this user. So, we have many permissions with different business logic but are checking in the code only one.
 This is the key!
 
 ### The ways to manage RBAC
 
 It is very popular to use database to store roles and permissions. It flexible but hard to support. Managing of roles
-and permissions required backend. When we start to use inheritance for permissions it becomes too difficult for direct
-changing.
+and permissions requires the backend.
 
 #### Static roles
 
@@ -139,7 +138,7 @@ with an overridden permission. Here is the example:
 Let's add the callback in `PostPolicy`.
 
 ``` php
-public function editPostInCategory($user, $post, $permissions): bool {
+public function editPostInCategory($authorizedUser, $post, $permissions): bool {
     return $permissions && $permissions->contains('value', $post->category_id);
 }
 ```
@@ -169,7 +168,7 @@ as you wish. It's very flexible.
 
 ## Usage
 
-As we said `h-rbac` is a wrapper for [authorization logic](https://laravel.com/docs/11.x/authorization#creating-policies)
+As we said `h-rbac` is a wrapper for [authorization logic](https://laravel.com/docs/12.x/authorization#creating-policies)
 since Laravel 5.1 to this time. So, you can use any features of it.
 
 ```php
@@ -235,13 +234,78 @@ The policy class should be the first element in array or it may has a key:
 ```php
 $this->authorize('download', ['current_date' => Carbon::now(), 'policy' => ReportPolicy::class]);
 ```
+### Helper
+
+There is an helper class `HRBACHelper` which includes a couple of methods 
+that make difficult things simpler.
+
+`getPermissionsPayload($user, $ability, $policyClass): Collection`
+
+gets all permissions that user has in current ability with extra information from overridden permissions.
+
+**Example**:
+
+Imagine that you need to show to user the list of posts that he allowed to edit.
+
+```php
+// PostPolicy.php
+// See more about 'chains' below
+public $chains = [
+    'edit' => [
+        'editAnyPost',
+        'editPostInCategory',
+        'editOwnPost',
+    ],
+];
+```
+
+Let user has `editOwnPost` and `editPostInCategory` (the last is overridden in the DB 
+with some specific categories). So, we can use helper in the piece of code, 
+where we take a set of posts:
+
+```php
+$helper = resolve(Dlnsk\HierarchicalRBAC\HRBACHelper::class);
+$permissions = $helper->getPermissionsPayload($user, 'edit', PostPolicy::class)
+$query = Post::query();
+if ($permissions->keys()->contains('editPostInCategory')) {
+    $query->orWhereIn(
+        'category_id', 
+        $permissions->get('editPostInCategory')->pluck('value')
+    );
+}
+if ($permissions->keys()->contains('editOwnPost')) {
+    $query->orWhere('user_id', $user->id);
+}
+$posts = $query->get();
+```
+
+The result of function won't have a permission if it "excluded" for the user.
+
+`canUserTakeAbility($user, $ability, $policyClass): bool|null`
+
+test that user has any permissions in the ability (chain) itself, but don't check permissions and them callbacks.
+
+**Example**:
+
+Let's continue with the last example. Now we need to display the menu item which will allow to show the list of posts.
+But only if user can edit something. It's simple:
+
+```php
+$helper = resolve(Dlnsk\HierarchicalRBAC\HRBACHelper::class);
+...
+if ($helper->canUserTakeAbility($user, 'edit', PostPolicy::class)) {
+    $menu->add('Posts', route('posts.index'));
+}
+```
+
+Yes. The list of posts can be empty if there is no suitable models, but it's not an authorization problem. :)
 
 ## Configuration
 
 ### Permissions
 
 Permissions and callbacks are defining in Policies as it describes in 
-[docs](https://laravel.com/docs/11.x/authorization#creating-policies). Innovation is the chains of permissions.
+[docs](https://laravel.com/docs/12.x/authorization#creating-policies). Innovation is the chains of permissions.
 
 ```php
 class PostPolicy
@@ -260,11 +324,11 @@ class PostPolicy
 
     ////////////// Callbacks ///////////////
 
-    public function editOwnPost($user, $post) {
-        return $user->id === $post->user_id;
+    public function editOwnPost($authorizedUser, $post) {
+        return $authorizedUser->id === $post->user_id;
     }
 
-    public function editPostInCategory($user, $post, $permissions): bool {
+    public function editPostInCategory($authorizedUser, $post, $permissions): bool {
         return $permissions && $permissions->contains('value', $post->category_id);
     }
 }

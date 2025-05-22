@@ -2,13 +2,9 @@
 
 namespace Dlnsk\HierarchicalRBAC;
 
-use Dlnsk\HierarchicalRBAC\Contracts\PermissionsProvider;
 use Dlnsk\HierarchicalRBAC\Contracts\PolicyBuilder;
 use Dlnsk\HierarchicalRBAC\Exceptions\PermissionNotFoundException;
-use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Str;
+use Dlnsk\HierarchicalRBAC\Exceptions\UserHasNoBuiltInRolesException;
 
 class CommonPermissionChecker implements Contracts\PermissionChecker
 {
@@ -16,10 +12,6 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
      * @var PermissionService
      */
     private $permissionService;
-    /**
-     * @var PermissionsProvider
-     */
-    private $permissionsProvider;
     /**
      * @var PolicyBuilder
      */
@@ -30,7 +22,6 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
     {
         $this->user = $user;
         $this->permissionService = resolve(PermissionService::class);
-        $this->permissionsProvider = resolve(PermissionsProvider::class, compact('user'));
     }
 
     public function setPolicyBuilder(PolicyBuilder $builder)
@@ -39,61 +30,37 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
     }
 
     /**
-     * Make some preparation for checking ability.
+     * Checking permission for chosen user
      *
-     * @param string $ability   The head ability whose chain we are checking
-     * @param mixed $arguments  Additional arguments for checking (model, policy and any other data)
+     * @param string $ability The head ability whose chain we are checking
+     * @param mixed $arguments Additional arguments for checking (model, policy and any other data)
      * @return bool|null
-     * @throws BindingResolutionException
+     * @throws PermissionNotFoundException
      */
     public function check($ability, $arguments): ?bool
     {
-        $user_roles = $this->permissionService->getUserRoles($this->user);
-        if (!count($user_roles)) {
-            // User has no application's built-in roles
+        $policy = $this->permissionService->getPolicy($arguments);
+        $policyWrapper = $this->policyBuilder->createWrapper($policy);
+
+        try {
+            $user_permissions_of_ability = $this->permissionService
+                ->getUserPermissionsOfAbility(
+                    $this->user,
+                    $ability,
+                    $policyWrapper
+                );
+        } catch (UserHasNoBuiltInRolesException $e) {
             return null;
-        }
-        $user_permissions = $this->permissionsProvider->getPermissions($user_roles);
-
-        return $this->checkAbility($user_permissions, $ability, $arguments);
-    }
-
-    /**
-     * Checking permission for chose user
-     *
-     * @param Collection $user_permissions  Set of permissions that user has. Structure is [<permission_name> => <collection of permissions> or NULL, ...]
-     * @param string $ability               The head ability whose chain we are checking
-     * @param mixed $arguments              Additional arguments for checking (model, policy and any other data)
-     * @return bool|null
-     * @throws BindingResolutionException
-     * @throws PermissionNotFoundException
-     */
-    public function checkAbility($user_permissions, $ability, $arguments): ?bool
-    {
-        if (isset($arguments['policy'])) {
-            $arg1 = $arguments['policy'];
-        } else {
-            $arg1 = head($arguments);
-        }
-        $policy = Gate::getPolicyFor($arg1);
-        // Allow to use policy's classes in Gate, not just models
-        if (!$policy && class_exists($arg1) && Str::endsWith($arg1, 'Policy')) {
-            $policy = app()->make($arg1);
-        }
-
-        $policyWrp = $this->policyBuilder->createWrapper($policy);
-        if (!$policyWrp->isValid() || !$policyWrp->hasAbility($ability)) {
+        } catch (PermissionNotFoundException $e) {
             if (config('h-rbac.exceptIfPermissionNotFound', false)) {
-                throw new PermissionNotFoundException();
+                throw $e;
             } else {
                 return null;
             }
         }
 
-        $chain = $policyWrp->getChainFor($ability);
-        $permission_intersection = $user_permissions->intersectByKeys(array_fill_keys($chain, null));
-        foreach ($permission_intersection as $permission => $values) {
-            $callback_name = $policyWrp->getCallbackName($permission);
+        foreach ($user_permissions_of_ability as $permission => $values) {
+            $callback_name = $policyWrapper->getCallbackName($permission);
             if ($callback_name) {
                 if (!empty($arguments)) {
                     // Pass arguments as array if it has more than one element, or it's associative array
@@ -101,7 +68,7 @@ class CommonPermissionChecker implements Contracts\PermissionChecker
                 } else {
                     $arg = null;
                 }
-                if ($policyWrp->call($callback_name, $this->user, $arg, $values, $ability)) {
+                if ($policyWrapper->call($callback_name, $this->user, $arg, $values, $ability)) {
                     return true;
                 }
             } else {

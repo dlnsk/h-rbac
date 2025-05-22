@@ -4,9 +4,12 @@ namespace Dlnsk\HierarchicalRBAC;
 
 use Dlnsk\HierarchicalRBAC\Contracts\PermissionsProvider;
 use Dlnsk\HierarchicalRBAC\Contracts\RolesProvider;
+use Dlnsk\HierarchicalRBAC\Exceptions\PermissionNotFoundException;
+use Dlnsk\HierarchicalRBAC\Exceptions\UserHasNoBuiltInRolesException;
 use Facade\Ignition\Support\ComposerClassMap;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 class PermissionService
@@ -34,6 +37,22 @@ class PermissionService
         }
 
         return $permissions;
+    }
+
+    public function getPolicy(array $arguments)
+    {
+        if (isset($arguments['policy'])) {
+            $arg1 = $arguments['policy'];
+        } else {
+            $arg1 = head($arguments);
+        }
+        $policy = Gate::getPolicyFor($arg1);
+        // Allow to use policy's classes in Gate, not just models
+        if (!$policy && class_exists($arg1) && Str::endsWith($arg1, 'Policy')) {
+            $policy = app()->make($arg1);
+        }
+
+        return $policy;
     }
 
     public function getPolicyNameByPermission($permission_name)
@@ -82,13 +101,20 @@ class PermissionService
         return null;
     }
 
+    /**
+     * @throws UserHasNoBuiltInRolesException
+     */
     public function getUserRoles($user): array
     {
         $rolesProvider = resolve(RolesProvider::class);
         $user_roles = $rolesProvider->getUserRoles($user);
         $application_roles = $rolesProvider->getApplicationRoles();
+        $intersection = array_intersect($application_roles, $user_roles);
+        if (!count($intersection)) {
+            throw new UserHasNoBuiltInRolesException();
+        }
 
-        return array_intersect($application_roles, $user_roles);
+        return $intersection;
     }
 
     public function getUserPermissions($user): Collection
@@ -97,6 +123,22 @@ class PermissionService
         $user_roles = $this->getUserRoles($user);
 
         return $permissionsProvider->getPermissions($user_roles);
+    }
+
+    /**
+     * return Collection
+     * @throws PermissionNotFoundException
+     * @throws UserHasNoBuiltInRolesException
+     */
+    public function getUserPermissionsOfAbility($user, $ability, $policyWrapper): Collection
+    {
+        if (!$policyWrapper->isValid() || !$policyWrapper->hasAbility($ability)) {
+            throw new PermissionNotFoundException();
+        }
+        $chain = $policyWrapper->getChainFor($ability);
+        $user_permissions = $this->getUserPermissions($user);
+
+        return $user_permissions->intersectByKeys(array_fill_keys($chain, null));
     }
 
     public function getRolesPermissions($roles): Collection

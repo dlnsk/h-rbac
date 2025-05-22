@@ -4,6 +4,13 @@ All Notable changes to `h-rbac` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## [1.1.0] - 2025-05-22
+### Changed
+- getUserRoles() now rises UserHasNoBuiltInRolesException. Backward compatible if you don't use this function directly
+
+### Added
+- HRBACHelper class added and gives some useful information
+
 ## [1.0.0] - 2024-05-14
 ### Changed
 - The module was fully rewritten with policy support

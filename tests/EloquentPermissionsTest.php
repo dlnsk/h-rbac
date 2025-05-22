@@ -3,7 +3,9 @@
 namespace Dlnsk\HierarchicalRBAC\Tests;
 
 use Dlnsk\HierarchicalRBAC\Contracts\PermissionsProvider;
+use Dlnsk\HierarchicalRBAC\HRBACHelper;
 use Dlnsk\HierarchicalRBAC\Providers\EloquentPermissionProvider;
+use Dlnsk\HierarchicalRBAC\Tests\Policies\PostPolicy;
 use Illuminate\Support\Facades\Gate;
 
 
@@ -171,4 +173,104 @@ class EloquentPermissionsTest extends TestCase
         $this->assertTrue(Gate::forUser($this->user)->allows('edit', $this->post));
     }
 
+    public function test_user_gets_role_permission_by_helper()
+    {
+        $this->user->id = 1;
+        $this->user->roles = 'user';
+
+        $hrbac_helper = resolve(HRBACHelper::class);
+        $permissions = $hrbac_helper->getPermissionsPayload($this->user, 'edit', PostPolicy::class);
+
+        $this->assertCount(1, $permissions);
+        $this->assertContainsEquals('editOwnPost', $permissions->keys());
+    }
+
+    public function test_user_gets_role_permission_but_without_excluded_by_helper()
+    {
+        $this->user->id = 1;
+        $this->user->roles = 'user';
+        $this->user->permissions = collect([
+            (object)[
+                'user_id' => 1,
+                'name' => 'editOwnPost',
+                'action' => 'exclude',
+            ],
+        ]);
+
+        $hrbac_helper = resolve(HRBACHelper::class);
+        $permissions = $hrbac_helper->getPermissionsPayload($this->user, 'edit', PostPolicy::class);
+
+        $this->assertCount(0, $permissions);
+    }
+
+    public function test_user_gets_different_permission_by_helper()
+    {
+        $this->user->id = 1;
+        $this->user->roles = 'user';
+        $this->user->permissions = collect([
+            (object)[
+                'user_id' => 1,
+                'name' => 'editFixedPost',
+                'action' => 'include',
+                'value' => 5,
+            ],
+        ]);
+
+        $hrbac_helper = resolve(HRBACHelper::class);
+        $permissions = $hrbac_helper->getPermissionsPayload($this->user, 'edit', PostPolicy::class);
+
+        $this->assertCount(2, $permissions);
+        $this->assertContainsEquals('editOwnPost', $permissions->keys());
+        $this->assertContainsEquals('editFixedPost', $permissions->keys());
+    }
+
+    public function test_user_gets_permission_values_by_helper()
+    {
+        $this->user->id = 1;
+        $this->user->roles = 'user';
+        $this->user->permissions = collect([
+            (object)[
+                'user_id' => 1,
+                'name' => 'editFixedPost',
+                'action' => 'include',
+                'value' => 5,
+            ],
+            (object)[
+                'user_id' => 1,
+                'name' => 'editFixedPost',
+                'action' => 'include',
+                'value' => 44,
+            ],
+        ]);
+
+        $hrbac_helper = resolve(HRBACHelper::class);
+        $permissions = $hrbac_helper->getPermissionsPayload($this->user, 'edit', PostPolicy::class);
+
+        $this->assertSame([5, 44], $permissions->get('editFixedPost')->pluck('value')->toArray());
+    }
+
+    public function test_user_gets_permission_without_excluded_by_helper()
+    {
+        $this->user->id = 1;
+        $this->user->roles = 'user';
+        $this->user->permissions = collect([
+            (object)[
+                'user_id' => 1,
+                'name' => 'editFixedPost',
+                'action' => 'include',
+                'value' => 5,
+            ],
+            (object)[
+                'user_id' => 1,
+                'name' => 'editFixedPost',
+                'action' => 'exclude',
+            ],
+        ]);
+
+        $hrbac_helper = resolve(HRBACHelper::class);
+        $permissions = $hrbac_helper->getPermissionsPayload($this->user, 'edit', PostPolicy::class);
+
+        $this->assertCount(1, $permissions);
+        $this->assertContainsEquals('editOwnPost', $permissions->keys());
+    }
 }
