@@ -25,10 +25,9 @@ class PermissionController extends BaseController
      */
     public function index(PermissionService $permissionService, string $user)
     {
+        $this->authorize('managePermissions', PermissionPolicy::class);
         $userClass = config('auth.providers.users.model');
         $user = $userClass::query()->findOrFail($user);
-//        $this->authorize('managePermissions', PermissionPolicy::class);
-
 
         $user_roles = $user->roles;
         $available_permissions = $permissionService->getBuiltInPermissions();
@@ -67,7 +66,7 @@ class PermissionController extends BaseController
      */
     public function store(Request $request, string $user)
     {
-//        $this->authorize('managePermissions', PermissionPolicy::class);
+        $this->authorize('managePermissions', PermissionPolicy::class);
         $userClass = config('auth.providers.users.model');
         $user = $userClass::query()->findOrFail($user);
 
@@ -105,7 +104,7 @@ class PermissionController extends BaseController
      */
     public function edit(PermissionService $permissionService, string $user, string $permission_name)
     {
-//        $this->authorize('managePermissions', PermissionPolicy::class);
+        $this->authorize('managePermissions', PermissionPolicy::class);
         $userClass = config('auth.providers.users.model');
         $user = $userClass::query()->findOrFail($user);
 
@@ -137,7 +136,7 @@ class PermissionController extends BaseController
      */
     public function destroy(string $user, string $permission)
     {
-//        $this->authorize('managePermissions', PermissionPolicy::class);
+        $this->authorize('managePermissions', PermissionPolicy::class);
         $permission = Permission::query()->findOrFail($permission);
 
         $permission_name = $permission->name;
