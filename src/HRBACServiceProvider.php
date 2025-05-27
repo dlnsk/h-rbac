@@ -6,6 +6,7 @@ use Dlnsk\HierarchicalRBAC\Contracts\PermissionsProvider;
 use Dlnsk\HierarchicalRBAC\Contracts\RolesProvider;
 use Dlnsk\HierarchicalRBAC\Providers\ArrayPermissionProvider;
 use Dlnsk\HierarchicalRBAC\Providers\ArrayRolesProvider;
+use Dlnsk\HierarchicalRBAC\Providers\EloquentPermissionProvider;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -26,7 +27,6 @@ class HRBACServiceProvider extends ServiceProvider {
     public $bindings = [
         PermissionChecker::class => CommonPermissionChecker::class,
         RolesProvider::class => ArrayRolesProvider::class,
-        PermissionsProvider::class => ArrayPermissionProvider::class,
     ];
 
     /**
@@ -47,11 +47,19 @@ class HRBACServiceProvider extends ServiceProvider {
             // Publish your config
             $this->publishes([
                 __DIR__.'/../config/config.php' => config_path($this->packageName.'.php'),
-            ], 'hrbac-config');
-            $this->publishes([
                 __DIR__.'/../Policies/' => app_path('Policies'),
             ], 'hrbac-config');
 
+            // Publish backend
+            $this->publishes([
+                __DIR__ . '/Backend/resources/views' => resource_path('views/vendor/'.$this->packageName),
+                __DIR__ . '/Backend/Http/PermissionPolicy.php' => app_path('Policies'),
+            ], 'hrbac-backend');
+        }
+
+        if (config('h-rbac.permissionsUI.enabled', false)) {
+            $this->loadRoutesFrom(__DIR__ . '/Backend/routes.php');
+            $this->loadViewsFrom(__DIR__ . '/Backend/resources/views', $this->packageName);
         }
 
         Blade::if('role', function ($roles) {
@@ -70,6 +78,12 @@ class HRBACServiceProvider extends ServiceProvider {
     public function register()
     {
         $this->mergeConfigFrom( __DIR__.'/../config/config.php', $this->packageName);
+
+        if (config('h-rbac.permissionsUI.enabled', false)) {
+            $this->app->bind(PermissionsProvider::class, EloquentPermissionProvider::class);
+        } else {
+            $this->app->bind(PermissionsProvider::class, ArrayPermissionProvider::class);
+        }
 
         Gate::before(function ($user, $ability, $arguments) {
             $permissionChecker = resolve(PermissionChecker::class, compact('user'));

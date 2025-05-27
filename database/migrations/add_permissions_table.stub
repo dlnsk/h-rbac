@@ -17,7 +17,7 @@ class AddPermissionsTable extends Migration
             $table->bigInteger('user_id')->index();     // User who owns the permission.
             $table->string('name')->index();            // Name of permission.
             $table->string('action', 10)->index();      // What to do with permission, 'include' or 'exclude'?
-            $table->string('value');                    // Not required. May have any type, any name.
+            $table->string('value')->nullable();        // Not required. May have any type, any name.
                                                         // You can add any number of additional fields.
         });
     }

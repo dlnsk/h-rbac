@@ -26,6 +26,14 @@
     'riseExceptionIfPermissionNotFound' => false,
 
 
+    'permissionsUI' => [
+        'enabled' => false,
+        'routePrefix' => '',
+        'routeMiddlewares' => ['auth'],
+        'baseLayout' => 'layout.app',
+    ],
+
+
     /**
      * Built-in application roles and its permissions
      */
