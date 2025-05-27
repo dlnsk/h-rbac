@@ -1,36 +1,29 @@
 <?php
 namespace Dlnsk\HierarchicalRBAC\Backend\Http;
 
-use App\User;
 use Dlnsk\HierarchicalRBAC\PermissionService;
 use Dlnsk\HierarchicalRBAC\Backend\Models\Permission;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 
 class PermissionController extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
     /**
-     * Просмотр списка разрешений пользователя.
+     * Show the list of user's permissions.
      *
-     * @param PassportService $passportService
      * @param PermissionService $permissionService
-     * @param User $user
-     * @return View|AnonymousResourceCollection
-     * @throws AuthorizationException
+     * @param string $user
+     * @return View
      */
-    public function index(PermissionService $permissionService, $user)
+    public function index(PermissionService $permissionService, string $user)
     {
         $userClass = config('auth.providers.users.model');
         $user = $userClass::query()->findOrFail($user);
@@ -66,13 +59,11 @@ class PermissionController extends BaseController
     }
 
     /**
-     * Добавление нового разрешения.
+     * Store the new overrided permission.
      *
      * @param Request $request
-     * @param User $user
+     * @param string $user
      * @return RedirectResponse
-     * @throws AuthorizationException
-     * @throws ValidationException
      */
     public function store(Request $request, string $user)
     {
@@ -104,13 +95,13 @@ class PermissionController extends BaseController
     }
 
     /**
-     * Редактирование переопределенных разрешений.
+     * Show a form to override the permission.
      *
      * @param PermissionService $permissionService
-     * @param User $user
+     * @param string $user
      * @param string $permission_name
-     * @return Application|Factory|View
-     * @throws AuthorizationException
+     * @return View
+     * @throws BindingResolutionException
      */
     public function edit(PermissionService $permissionService, string $user, string $permission_name)
     {
@@ -137,12 +128,12 @@ class PermissionController extends BaseController
     }
 
     /**
-     * Удаление разрешения пользователя.
+     * Delete the permission's overrides.
      *
-     * @param User $user
-     * @param Permission $permission
+     * @param string $user
+     * @param string $permission
      * @return RedirectResponse
-     * @throws AuthorizationException
+     * @throws \Exception
      */
     public function destroy(string $user, string $permission)
     {
