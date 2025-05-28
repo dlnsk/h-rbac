@@ -39,12 +39,13 @@ class PermissionController extends BaseController
                 $groups = $item->keys();
                 $include = $groups->contains(Permission::INCLUDE);
                 $exclude = $groups->contains(Permission::EXCLUDE);
+                $values = optional($item->get(Permission::INCLUDE))->pluck('value');
 
                 return [$key => (object)[
                     'include' => $include,
                     'exclude' => $exclude,
                     'warning' => $include && $exclude,
-                    'values' => optional($item->get(Permission::INCLUDE))->pluck('value'),
+                    'values' => $values ? $values->filter() : null,
                 ]];
 
             });
