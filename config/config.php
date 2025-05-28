@@ -42,6 +42,8 @@
             'editAnyPost',
             'deleteAnyPost',
             'listAnyReports',
+
+            'managePermissions',
         ],
         'user' => [
             'editOwnPost',
