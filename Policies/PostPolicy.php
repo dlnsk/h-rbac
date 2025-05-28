@@ -35,11 +35,13 @@ class PostPolicy
     }
 
     /**
+     * Backend UI
+     *
      * Tells to backend to add UI element like select or input with appropriate value(s) for this permission.
-     * Feel free to return any value that you want. You can also return type of input (as you see here).
+     * Return array to show <select> element or type of <input> (as you see here) to allow direct input value.
      * This kind of method should have postfix 'Params'.
      *
-     * @return string
+     * @return string|array
      */
     public function editFixedPostParams() {
         return '##_number_##';

@@ -62,8 +62,8 @@
           <label class="mr-2" for="perm-value">@lang('h-rbac::permissions.value')</label>
           <select name="value" class="custom-select mr-sm-2" id="perm-value">
             <option selected disabled>@lang('h-rbac::permissions.choose')</option>
-            @foreach($params as $param)
-              <option value="{{ $param }}">{{ $param }}</option>
+            @foreach($params as $key => $value)
+              <option value="{{ $key }}">{{ $value }}</option>
             @endforeach
           </select>
         @elseif(is_string($params))
