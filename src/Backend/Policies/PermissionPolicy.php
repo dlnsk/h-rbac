@@ -1,5 +1,5 @@
 <?php
-namespace Dlnsk\HierarchicalRBAC\Backend\Http;
+namespace Dlnsk\HierarchicalRBAC\Backend\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
 

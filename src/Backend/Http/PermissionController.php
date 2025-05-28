@@ -1,8 +1,9 @@
 <?php
 namespace Dlnsk\HierarchicalRBAC\Backend\Http;
 
-use Dlnsk\HierarchicalRBAC\PermissionService;
 use Dlnsk\HierarchicalRBAC\Backend\Models\Permission;
+use Dlnsk\HierarchicalRBAC\Backend\Policies\PermissionPolicy;
+use Dlnsk\HierarchicalRBAC\PermissionService;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;

@@ -53,7 +53,6 @@ class HRBACServiceProvider extends ServiceProvider {
             // Publish backend
             $this->publishes([
                 __DIR__ . '/Backend/resources/views' => resource_path('views/vendor/'.$this->packageName),
-                __DIR__ . '/Backend/Http/PermissionPolicy.php' => app_path('Policies'),
             ], 'hrbac-backend');
         }
 
