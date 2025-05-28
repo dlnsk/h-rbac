@@ -1,7 +1,7 @@
 @extends(config('h-rbac.permissionsUI.baseLayout'))
 
 @section('header')
-  Разрешение "{{ __("permissions.$policy_name.$permission_name") }}"
+  @lang('h-rbac::permissions.permission') "@lang("h-rbac::permissions.$policy_name.$permission_name")"
 @endsection
 
 @section('content')
@@ -10,16 +10,16 @@
       <table class="table">
         <thead>
         <tr>
-          <th>Вид</th>
-          <th>Параметр</th>
-          <th class="text-right">Действия</th>
+          <th>@lang('h-rbac::permissions.kind')</th>
+          <th>@lang('h-rbac::permissions.param')</th>
+          <th class="text-right">@lang('h-rbac::permissions.actions')</th>
         </tr>
         </thead>
         <tbody>
         @foreach($permissions as $permission)
           <tr>
             <td class="{{ ($permission->action == \Dlnsk\HierarchicalRBAC\Backend\Models\Permission::EXCLUDE ? 'text-danger' : '') }}">
-              {{ __("permissions.$permission->action") }}
+              @lang("h-rbac::permissions.{$permission->action}d")
             </td>
             <td>{{ $permission->value }}</td>
             <td class="text-right">
@@ -28,7 +28,7 @@
                     method="POST">
                 @method('DELETE')
                 <button class="btn btn-sm btn-danger"
-                        onclick="if(!confirm('Точно?')) return false;"
+                        onclick="if(!confirm('@lang('h-rbac::permissions.sure')')) return false;"
                         type="submit"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
@@ -51,27 +51,27 @@
         @csrf
         <input name="name" type="hidden" value="{{ $permission_name }}">
 
-        <label class="mr-2" for="perm-kind">Вид</label>
+        <label class="mr-2" for="perm-kind">@lang('h-rbac::permissions.kind')</label>
         <select name="action" class="custom-select mr-sm-2" id="perm-kind">
-          <option selected>Выберите...</option>
-          <option value="exclude">Изъять</option>
-          <option value="include">Предоставить</option>
+          <option selected>@lang('h-rbac::permissions.choose')</option>
+          <option value="exclude">@lang('h-rbac::permissions.exclude')</option>
+          <option value="include">@lang('h-rbac::permissions.include')</option>
         </select>
 
         @if(is_countable($params))
-          <label class="mr-2" for="perm-value">Значение</label>
+          <label class="mr-2" for="perm-value">@lang('h-rbac::permissions.value')</label>
           <select name="value" class="custom-select mr-sm-2" id="perm-value">
-            <option selected disabled>Выберите...</option>
+            <option selected disabled>@lang('h-rbac::permissions.choose')</option>
             @foreach($params as $param)
               <option value="{{ $param }}">{{ $param }}</option>
             @endforeach
           </select>
         @elseif(is_string($params))
-          <label class="mr-2" for="perm-value">Значение</label>
+          <label class="mr-2" for="perm-value">@lang('h-rbac::permissions.value')</label>
           <input name="value" type="{{ trim($params, '#_') }}" class="form-control mr-sm-2" id="perm-value">
         @endif
 
-        <button type="submit" class="btn btn-success">Добавить</button>
+        <button type="submit" class="btn btn-success">@lang('h-rbac::permissions.add')</button>
       </form>
     </div>
 

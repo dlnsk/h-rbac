@@ -1,7 +1,7 @@
 @extends(config('h-rbac.permissionsUI.baseLayout'))
 
 @section('header')
-  Разрешения для {{ $user->name }}
+  @lang('h-rbac::permissions.permissions_for', ['user' => $user->name])
 @endsection
 
 @section('content')

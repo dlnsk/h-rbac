@@ -60,6 +60,7 @@ class HRBACServiceProvider extends ServiceProvider {
         if (config('h-rbac.permissionsUI.enabled', false)) {
             $this->loadRoutesFrom(__DIR__ . '/Backend/routes.php');
             $this->loadViewsFrom(__DIR__ . '/Backend/resources/views', $this->packageName);
+            $this->loadTranslationsFrom(__DIR__.'/Backend/resources/lang', $this->packageName);
         }
 
         Blade::if('role', function ($roles) {
