@@ -70,6 +70,7 @@ if (\Gate::can('editOwnPost', $post)) {
 You can pass any number of parameters in callback as array.
 
 That's what you can do with Laravel's policies as it described in docs. But Laravel doesn't support roles.
+Let's see what new adds the module.
 
 ### Permission's inheritance
 
@@ -156,10 +157,13 @@ Now, if we add to `permissions` table next record
 
 we'll allow user with `id = 100` edit any post in category with `id = 5`.
 
-The word `exclude` may also be in `action` field. This takes away the ability from user. 
+The word `exclude` may also be in the `action` field. This takes away the ability from user. 
 If both actions exists in database, the `exclude` wins.
 
 The field `value` doesn't used by the module at all, so you can use any type for it or even a set of any extra fields.
+
+Are you think it'll be quite hard to manage overrides? 
+Just use embedded [Permissions Backend UI](#permissions-backend-ui)!
 
 #### Different way
 
@@ -376,6 +380,49 @@ Roles are defining in config file (config/h-rbac.php)
 
 If you want to store assigning permissions to roles in database, just make your 
 own `RolesProvider` to change this logic.
+
+### Permissions Backend UI
+
+Permissions Backend UI is an embedded way to manage permission overrides. 
+Backend is configured in `config/h-rbac.php`:
+
+```php
+'permissionsUI' => [
+    'enabled' => true,
+    'routePrefix' => '',
+    'routeMiddlewares' => ['auth'],
+    'baseLayout' => 'layout.app',
+],
+```
+To switch on the backend set `permissionsUI.enabled` to true, publish and do migration 
+to create `permissions` table and bind `EloquentPermissionProvider` as described 
+in [Static roles + overriding permissions](#static-roles--overriding-permissions).
+
+#### Parameters
+
+`enabled` - enable or disable backend UI.
+
+`routePrefix` - the backend routes look like /{prefix}/{user}/permissions/{params}, 
+so here you can choose appropriate prefix for UI.
+
+`routeMiddlewares` - the array of middlewares that should check for access to backend.
+
+`baseLayout` - the layout for backend's views. We use *header* and *content* sections.
+
+Remember that you can totally rewrite views after publish them in your own project:
+
+    php artisan vendor:publish --tag=hrbac-backend
+
+#### Do you need an own much cooler UI?
+
+No problem. Just copy and integrate in your project next files:
+
+    src/Backend/routes.php
+    src/Backend/Http/PermissionController.php
+    src/Backend/Models/Permission.php
+    src/Backend/Policies/PermissionPolicy.php
+    src/Backend/resources/lang/*
+    src/Backend/resources/views/*
 
 ## Change log
 

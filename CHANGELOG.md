@@ -4,6 +4,10 @@ All Notable changes to `h-rbac` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## [1.2.0] - 2025-05-29
+### Added
+- Backend UI to override permissions
+
 ## [1.1.0] - 2025-05-22
 ### Changed
 - getUserRoles() now rises UserHasNoBuiltInRolesException. Backward compatible if you don't use this function directly
