@@ -1,6 +1,7 @@
 @extends(config('h-rbac.permissionsUI.baseLayout'))
 
 @section('header')
+  <a href="{{ route('permissions.index', $user) }}">&lt;</a>
   @lang('h-rbac::permissions.permission') "@lang("h-rbac::permissions.$policy_name.$permission_name")"
 @endsection
 
