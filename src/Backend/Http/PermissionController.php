@@ -3,6 +3,7 @@ namespace Dlnsk\HierarchicalRBAC\Backend\Http;
 
 use Dlnsk\HierarchicalRBAC\Backend\Models\Permission;
 use Dlnsk\HierarchicalRBAC\Backend\Policies\PermissionPolicy;
+use Dlnsk\HierarchicalRBAC\Contracts\RolesProvider;
 use Dlnsk\HierarchicalRBAC\PermissionService;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\View\View;
@@ -49,6 +50,7 @@ class PermissionController extends BaseController
                 ]];
 
             });
+        $enable_management = method_exists($user, config("h-rbac.permissionsAttribute"));
 
         return view('h-rbac::permission.list', compact([
             'user',
@@ -56,6 +58,7 @@ class PermissionController extends BaseController
             'available_permissions',
             'roles_permissions',
             'extra_permissions',
+            'enable_management',
         ]));
     }
 
@@ -110,12 +113,9 @@ class PermissionController extends BaseController
         $userClass = config('auth.providers.users.model');
         $user = $userClass::query()->findOrFail($user);
 
-        $permissions = Permission::query()
-            ->where('user_id', $user->id)
-            ->where('name', $permission_name)
-            ->orderBy('action')
-            ->orderBy('id')
-            ->get();
+        $permissions = $permissionService
+            ->getUserExtraPermissions($user)
+                ->where('name', $permission_name);
         $policy_name = $permissionService->getPolicyNameByPermission($permission_name);
         $params = $permissionService->getPermissionParams($permission_name);
 

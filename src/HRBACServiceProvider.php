@@ -6,7 +6,6 @@ use Dlnsk\HierarchicalRBAC\Contracts\PermissionsProvider;
 use Dlnsk\HierarchicalRBAC\Contracts\RolesProvider;
 use Dlnsk\HierarchicalRBAC\Providers\ArrayPermissionProvider;
 use Dlnsk\HierarchicalRBAC\Providers\ArrayRolesProvider;
-use Dlnsk\HierarchicalRBAC\Providers\EloquentPermissionProvider;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -27,6 +26,7 @@ class HRBACServiceProvider extends ServiceProvider {
     public $bindings = [
         PermissionChecker::class => CommonPermissionChecker::class,
         RolesProvider::class => ArrayRolesProvider::class,
+        PermissionsProvider::class => ArrayPermissionProvider::class,
     ];
 
     /**
@@ -78,12 +78,6 @@ class HRBACServiceProvider extends ServiceProvider {
     public function register()
     {
         $this->mergeConfigFrom( __DIR__.'/../config/config.php', $this->packageName);
-
-        if (config('h-rbac.permissionsUI.enabled', false)) {
-            $this->app->bind(PermissionsProvider::class, EloquentPermissionProvider::class);
-        } else {
-            $this->app->bind(PermissionsProvider::class, ArrayPermissionProvider::class);
-        }
 
         Gate::before(function ($user, $ability, $arguments) {
             $permissionChecker = resolve(PermissionChecker::class, compact('user'));

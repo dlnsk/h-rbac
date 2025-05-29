@@ -9,5 +9,5 @@ class Permission extends Model
     const EXCLUDE = 'exclude';
 
     public $timestamps = false;
-    protected $fillable = ['name', 'value', 'action'];
+    protected $guarded = ['user_id'];
 }
