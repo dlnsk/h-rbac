@@ -10,6 +10,7 @@ return [
     'permission' => 'Permission',
     'permissions_for' => 'Permission for :User',
     'role' => 'Role',
+    'user_roles' => 'User roles',
     'kind' => 'Kind',
     'param' => 'Parameter',
     'params' => 'Parameters',

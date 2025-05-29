@@ -10,6 +10,7 @@ return [
     'permission' => 'Разрешение',
     'permissions_for' => 'Разрешения для :User',
     'role' => 'Роль',
+    'user_roles' => 'Роли пользователя',
     'kind' => 'Вид',
     'param' => 'Параметр',
     'params' => 'Параметры',
