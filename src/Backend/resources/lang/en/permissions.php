@@ -7,26 +7,25 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'permission' => 'Permission',
-    'permissions_for' => 'Permission for :User',
-    'role' => 'Role',
-    'user_roles' => 'User roles',
+    'actions' => 'Actions',
+    'add' => 'Add',
+    'choose' => 'Choose...',
+    'conflict' => 'Permission conflict',
+    'edit' => 'Edit',
+    'exclude' => 'Deny',
+    'excluded' => 'Denied',
+    'include' => 'Allow',
+    'included' => 'Allowed',
     'kind' => 'Kind',
     'param' => 'Parameter',
     'params' => 'Parameters',
-    'actions' => 'Actions',
+    'permission' => 'Permission',
+    'permissions_for' => 'Permission for :User',
     'provided_by_role' => 'Provided by one of the roles',
-    'conflict' => 'Permission conflict',
-    'edit' => 'Edit',
+    'role' => 'Role',
     'sure' => 'Are you sure?',
-    'choose' => 'Choose...',
+    'user_roles' => 'User roles',
     'value' => 'Value',
-    'add' => 'Add',
-
-    'include' => 'Allow',
-    'included' => 'Allowed',
-    'exclude' => 'Deny',
-    'excluded' => 'Denied',
 
 
     'PermissionPolicy' => [
