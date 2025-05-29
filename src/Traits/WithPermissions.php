@@ -1,7 +1,7 @@
 <?php
-namespace Dlnsk\HierarchicalRBAC\Backend\Traits;
+namespace Dlnsk\HierarchicalRBAC\Traits;
 
-use Dlnsk\HierarchicalRBAC\Backend\Models\Permission;
+use Dlnsk\HierarchicalRBAC\Models\Permission;
 
 trait WithPermissions {
 

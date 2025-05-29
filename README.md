@@ -124,13 +124,25 @@ It requires additional database table to store overrides. Publish migration with
 
     php artisan vendor:publish --tag=hrbac-migrations
 
-and bind `EloquentPermissionProvider` inside your `AppServiceProvider.php` bindings:
+bind `EloquentPermissionProvider` inside your `AppServiceProvider.php` bindings:
 
 ``` php
 public $bindings = [
     PermissionsProvider::class => EloquentPermissionProvider::class,
     ...
 ];
+```
+
+and add trait `WithPermissions` to your `User` model
+
+```php
+<?php
+
+class User extends Authenticatable
+{
+    use \Dlnsk\HierarchicalRBAC\Traits\WithPermissions;
+    ...
+}
 ```
 
 Now every record in `permissions` table adds or removes one permission from user. You also can store additional value(s) 
@@ -402,7 +414,7 @@ in [Static roles + overriding permissions](#static-roles--overriding-permissions
 
 `enabled` - enable or disable backend UI.
 
-`routePrefix` - the backend routes look like /{prefix}/{user}/permissions/{params}, 
+`routePrefix` - the backend routes look like `/{prefix}/{user}/permissions/{params}`, 
 so here you can choose appropriate prefix for UI.
 
 `routeMiddlewares` - the array of middlewares that should check for access to backend.
@@ -419,10 +431,10 @@ No problem. Just copy and integrate in your project next files:
 
     src/Backend/routes.php
     src/Backend/Http/PermissionController.php
-    src/Backend/Models/Permission.php
     src/Backend/Policies/PermissionPolicy.php
     src/Backend/resources/lang/*
     src/Backend/resources/views/*
+    src/Models/Permission.php
 
 ## Change log
 

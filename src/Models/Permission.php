@@ -1,5 +1,5 @@
 <?php
-namespace Dlnsk\HierarchicalRBAC\Backend\Models;
+namespace Dlnsk\HierarchicalRBAC\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

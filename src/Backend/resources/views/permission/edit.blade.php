@@ -19,7 +19,8 @@
         <tbody>
         @foreach($permissions as $permission)
           <tr>
-            <td class="{{ ($permission->action == \Dlnsk\HierarchicalRBAC\Backend\Models\Permission::EXCLUDE ? 'text-danger' : '') }}">
+            <td
+              class="{{ ($permission->action == \Dlnsk\HierarchicalRBAC\Models\Permission::EXCLUDE ? 'text-danger' : '') }}">
               @lang("h-rbac::permissions.{$permission->action}d")
             </td>
             <td>{{ $permission->value }}</td>
