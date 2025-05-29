@@ -10,8 +10,8 @@ class PostPolicy
     public $chains = [
         'edit' => [
             'editAnyPost',
+            'editPostInCategory',
             'editOwnPost',
-            'editFixedPost',
         ],
         'delete' => [
             'deleteAnyPost',
@@ -27,11 +27,12 @@ class PostPolicy
     }
 
     /**
-     * Permissions variable contains collection with post ids which allowed to edit to this user.
+     * The permissions variable contains a collection of permission overrides which field 'value' keeps
+     * category IDs whose posts are allowed to be edited by the given user.
      * If there aren't any records, it contains null.
      */
-    public function editFixedPost($authorizedUser, $post, $permissions): bool {
-        return $permissions && $permissions->contains('value', $post->id);
+    public function editPostInCategory($authorizedUser, $post, $permissions): bool {
+        return $permissions && $permissions->contains('value', $post->category_id);
     }
 
     /**
@@ -43,7 +44,7 @@ class PostPolicy
      *
      * @return string|array
      */
-    public function editFixedPostParams() {
+    public function editPostInCategoryParams() {
         return '##_number_##';
     }
 }
