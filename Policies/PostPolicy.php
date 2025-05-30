@@ -10,8 +10,8 @@ class PostPolicy
     public $chains = [
         'edit' => [
             'editAnyPost',
+            'editPostInCategory',
             'editOwnPost',
-            'editFixedPost',
         ],
         'delete' => [
             'deleteAnyPost',
@@ -27,21 +27,24 @@ class PostPolicy
     }
 
     /**
-     * Permissions variable contains collection with post ids which allowed to edit to this user.
+     * The permissions variable contains a collection of permission overrides which field 'value' keeps
+     * category IDs whose posts are allowed to be edited by the given user.
      * If there aren't any records, it contains null.
      */
-    public function editFixedPost($authorizedUser, $post, $permissions): bool {
-        return $permissions && $permissions->contains('value', $post->id);
+    public function editPostInCategory($authorizedUser, $post, $permissions): bool {
+        return $permissions && $permissions->contains('value', $post->category_id);
     }
 
     /**
+     * Backend UI
+     *
      * Tells to backend to add UI element like select or input with appropriate value(s) for this permission.
-     * Feel free to return any value that you want. You can also return type of input (as you see here).
+     * Return array to show <select> element or type of <input> (as you see here) to allow direct input value.
      * This kind of method should have postfix 'Params'.
      *
-     * @return string
+     * @return string|array
      */
-    public function editFixedPostParams() {
+    public function editPostInCategoryParams() {
         return '##_number_##';
     }
 }

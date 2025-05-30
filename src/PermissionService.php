@@ -18,7 +18,9 @@ class PermissionService
     {
         $available_classes = array_keys((new ComposerClassMap)->listClasses());
         $policies = array_filter($available_classes, function($item) {
-            return Str::contains($item, "\\Policies\\") && Str::endsWith($item, "Policy");
+            return Str::contains($item, "\\Policies\\")
+                && Str::endsWith($item, "Policy")
+                && !Str::contains($item, "\\src\\");
         });
 
         return collect($policies);

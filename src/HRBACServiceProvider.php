@@ -47,11 +47,19 @@ class HRBACServiceProvider extends ServiceProvider {
             // Publish your config
             $this->publishes([
                 __DIR__.'/../config/config.php' => config_path($this->packageName.'.php'),
-            ], 'hrbac-config');
-            $this->publishes([
                 __DIR__.'/../Policies/' => app_path('Policies'),
             ], 'hrbac-config');
 
+            // Publish backend
+            $this->publishes([
+                __DIR__ . '/Backend/resources/views' => resource_path('views/vendor/'.$this->packageName),
+            ], 'hrbac-backend');
+        }
+
+        if (config('h-rbac.permissionsUI.enabled', false)) {
+            $this->loadRoutesFrom(__DIR__ . '/Backend/routes.php');
+            $this->loadViewsFrom(__DIR__ . '/Backend/resources/views', $this->packageName);
+            $this->loadTranslationsFrom(__DIR__.'/Backend/resources/lang', $this->packageName);
         }
 
         Blade::if('role', function ($roles) {
