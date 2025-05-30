@@ -417,7 +417,7 @@ in [Static roles + overriding permissions](#static-roles--overriding-permissions
 `routePrefix` - the backend routes look like `/{prefix}/{user}/permissions/{params}`, 
 so here you can choose appropriate prefix for UI.
 
-`routeMiddlewares` - the array of middlewares that should check for access to backend.
+`routeMiddlewares` - an array of middlewares that filter the request to backend UI.
 
 `baseLayout` - the layout for backend's views. We use *header* and *content* sections.
 
