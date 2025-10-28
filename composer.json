@@ -11,8 +11,8 @@
         }
     ],
     "require": {
-        "facade/ignition": "^1.18|^2.5",
-        "laravel/framework": "~5.7|>=6.0"
+        "laravel/framework": "~5.7|>=6.0",
+        "haydenpierce/class-finder": "^0.5.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^8.0",

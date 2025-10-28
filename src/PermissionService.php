@@ -6,7 +6,7 @@ use Dlnsk\HierarchicalRBAC\Contracts\PermissionsProvider;
 use Dlnsk\HierarchicalRBAC\Contracts\RolesProvider;
 use Dlnsk\HierarchicalRBAC\Exceptions\PermissionNotFoundException;
 use Dlnsk\HierarchicalRBAC\Exceptions\UserHasNoBuiltInRolesException;
-use Facade\Ignition\Support\ComposerClassMap;
+use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -16,7 +16,8 @@ class PermissionService
 {
     public function getBuiltInPolicies(): Collection
     {
-        $available_classes = array_keys((new ComposerClassMap)->listClasses());
+        ClassFinder::disablePSR4Vendors();
+        $available_classes = ClassFinder::getClassesInNamespace('App', ClassFinder::RECURSIVE_MODE);
         $policies = array_filter($available_classes, function($item) {
             return Str::contains($item, "\\Policies\\")
                 && Str::endsWith($item, "Policy")
