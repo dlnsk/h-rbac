@@ -5,6 +5,7 @@ namespace Dlnsk\HierarchicalRBAC\Providers;
 use Dlnsk\HierarchicalRBAC\Contracts;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class ArrayRolesProvider implements Contracts\RolesProvider
 {
@@ -12,7 +13,10 @@ class ArrayRolesProvider implements Contracts\RolesProvider
     {
         $roles_attr = config('h-rbac.userRolesAttribute', 'role');
 
-        return Arr::wrap($user->$roles_attr ?? null);
+        return Cache::driver('array')
+            ->remember("roles_$user->id", 60, function () use ($user, $roles_attr) {
+                return Arr::wrap($user->$roles_attr ?? null);
+            });
     }
 
     public function getApplicationRoles(): array
